@@ -75,23 +75,16 @@ export class HomeComponent implements OnInit {
           responsiveClass: true,
         });
         jQuery('.topper-carousel').owlCarousel({
-          stagePadding: 30,
           items: 2,
-          loop: false,
+          loop: true,
           dots: false,
-          nav: true,
+          nav: false,
           responsiveClass: true,
-          // navText: [
-          //   "<button style='position:absolute;left:-12px;background:#8c88ff3d;color:#4e4caacd;border:none;border-radius:50%;width:30px;height:30px;top:50%;transform:translateY(-50%);'><mat-icon style='margin-top:2px;margin-left:-3px;' class='material-icons'>keyboard_arrow_left</mat-icon></button>",
-          //   "<button style='position:absolute;right:-12px;background:#8c88ff3d;color:#4e4caacd;border:none;border-radius:50%;width:30px;height:30px;top:50%;transform:translateY(-50%);'><mat-icon style='margin-top:2px;margin-left:-3px;' class='material-icons'>keyboard_arrow_right</mat-icon></button>"
-          // ],
           responsive: {
             600: {
-              stagePadding: 30,
-              items: 4,
+              items: 5,
             },
             1500: {
-              stagePadding: 50,
               items: 5,
             },
           }
