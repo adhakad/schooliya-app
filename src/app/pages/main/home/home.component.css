@@ -1,9 +1,10 @@
 .home {
-   /* background-color: rgb(243, 239, 255); */
+   background-color: rgb(251, 250, 255);
 }
 
 .banner {
-   background-image: linear-gradient(-225deg, rgb(24, 5, 46) 0%, rgb(104, 36, 186) 73%, rgb(36, 8, 71) 100%);
+   min-height: 75vh;
+   background-image: linear-gradient(-225deg, rgb(27, 3, 48) 20%,rgb(27, 3, 48) 20%, rgb(123, 36, 186) 73%, rgb(28, 4, 57) 98%);
 }
 
 .box div {
@@ -88,11 +89,9 @@
 
 .pricing-section {
    min-height: 550px;
-   /* background-color: rgb(241, 237, 254); */
-   padding-bottom: 75px;
-   opacity: .9;
-   /* background-image: radial-gradient(rgba(143, 126, 255, 0.847) .5px, rgb(241, 237, 254) .5px); */
-   background-size: 10px 10px;
+   background-image:radial-gradient(rgb(203, 195, 255) .5px, rgb(181, 170, 255) .5px);
+   /* background-size: 5px 5px; */
+   padding-bottom: 75px !important;
 
 }
 
@@ -103,7 +102,7 @@
 }
 
 .pricing-section .title h2 {
-   font-family:'Segoe UI',Verdana;
+   font-family: 'Segoe UI', Verdana;
    font-size: 32px;
    font-weight: 700;
    color: #382066;
@@ -112,17 +111,11 @@
 
 .pricing-card {
    text-align: center;
-   background-color: rgb(247, 244, 255);
+   background-color: rgb(250, 249, 255);
    width: 100%;
    height: 62vh;
    margin-bottom: 30px;
    border-radius: 25px;
-}
-
-.customer-section {
-   min-height: 200px;
-   padding-top: 75px;
-   padding-bottom: 75px;
 }
 
 .service-section {
@@ -137,7 +130,7 @@
 }
 
 .service-section .title h2 {
-   font-family:'Segoe UI',Verdana;
+   font-family: 'Segoe UI', Verdana;
    font-size: 30px;
    font-weight: 500;
    color: #382066;
@@ -145,11 +138,13 @@
 }
 
 .service-card {
-   background-color: rgb(241, 237, 254);
+   background-color: transparent;
    width: 100%;
    height: 62vh;
    margin-bottom: 30px;
    border-radius: 25px;
+   border: 1px solid #fff;
+
 }
 
 
@@ -165,12 +160,12 @@
    }
 
    .pricing-card {
-      background-color: #fff;
+      background-color: #f0eeff;
       width: 100%;
       height: auto;
       padding: 30px;
       border-radius: 5px;
-      border:1px solid #e1d2ff;
+      border: 1px solid #fff;
       /* box-shadow: 0 0 1px -10px #e4d4ff,
          0 0 0 0 #e4d4ff,
          0 0 20px 0 #ede3ff; */
@@ -179,30 +174,34 @@
    .pricing-card h2 {
       color: #382066;
       text-align: center;
-      font-family:'Segoe UI',Verdana;
+      font-family: 'Segoe UI', Verdana;
       font-size: 25px;
       font-weight: 700;
       letter-spacing: .75px;
    }
-   .pricing-card .pricing-title{
+
+   .pricing-card .pricing-title {
       min-height: 110px;
    }
+
    .pricing-card p {
       color: #382066;
       text-align: center;
       text-align: center;
-      font-family:'Segoe UI',Verdana;
+      font-family: 'Segoe UI', Verdana;
       font-size: 15px;
       font-weight: 400;
    }
+
    .pricing-card h3 {
       color: #382066;
       text-align: center;
-      font-family:'Segoe UI',Verdana;
+      font-family: 'Segoe UI', Verdana;
       font-size: 30px;
       font-weight: 700;
       letter-spacing: .75px;
    }
+
    .pricing-button {
       height: 50px;
       background: #8C52FF;
@@ -214,58 +213,138 @@
       padding-left: 85px;
       padding-right: 85px;
       text-align: center;
-    }
-    
-    .pricing-button.mat-button-disabled:not([class*=mat-elevation-z]) {
+   }
+
+   .pricing-button.mat-button-disabled:not([class*=mat-elevation-z]) {
       /* background: #e7e6f897;
       color: #8C52FF9a; */
       background: #ebebff;
       color: #4e4caacd;
       cursor: not-allowed;
-    }
+   }
 
-   .pricing-card .pricing-amount p{
+   .pricing-card .pricing-amount p {
       margin-top: 15px;
       margin-bottom: 25px;
       color: #392066dd;
    }
-   .mat-divider{
-      background-color:#e1d2ff;
+
+   .mat-divider {
+      background-color: #e1d2ff;
       height: 1.5px;
 
    }
 
-   .pricing-feature h3{
+   .pricing-feature h3 {
       font-size: 18px;
       font-weight: 700;
       text-align: left;
       margin-top: 20px;
    }
-   .pricing-feature p{
+
+   .pricing-feature p {
       font-size: .85rem;
       font-weight: 700;
       text-align: left;
       margin-top: 20px;
    }
-   .pricing-feature span{
+
+   .pricing-feature span {
       font-size: .85rem;
       font-weight: 600;
       text-align: left;
       margin-top: 20px;
    }
+
+   .customer-section {
+      background: linear-gradient(to right, rgb(202, 193, 255), rgb(234, 230, 255));
+      background-size: .5px .5px; 
+      padding-top: 55px;
+      padding-bottom: 55px;
+   }
+
+   .customer-section h3 {
+      font-family: 'Segoe UI', Verdana;
+      color: #382066;
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: .5px;
+      text-align: center;
+      margin-top: 20px;
+   }
+
+   .customer-section h2 {
+      font-family: 'Segoe UI', Verdana;
+      font-size: 32px;
+      font-weight: 700;
+      color: #382066;
+      letter-spacing: .5px;
+      text-align: center;
+      margin-top: 20px;
+   }
+
+   .customer-section p {
+      font-family: 'Segoe UI', Verdana;
+      color: #77779f;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: .5px;
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 50px;
+   }
+
+   .topper-card {
+      width: 150px;
+      height: 150px;
+      background-color: #f0eeff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border: 1px solid #fcfcfc;
+      border-radius: 50%;
+   }
+
+   .topper-card img {
+      width: 50% !important;
+      height: 50% !important;
+      text-align: center;
+      align-items: center;
+   }
+
+   .topper-card h3 {
+      color: #382066;
+      font-size: 16px;
+      font-weight: 500;
+      margin-top: 20px;
+
+   }
+
+   .service-section {
+      background:  rgb(242, 239, 255);
+   }
+
    .service-card-container {
       /* padding-left: 40px;
       padding-right: 40px; */
    }
 
    .service-card {
-      background-color: #fff;
+      background:linear-gradient(to right,#c5beff,#e3dfff,#e3dfff);
+      color:#7239dd;
       width: 100%;
       height: 15vh;
+      text-align: center;
       margin-bottom: 30px;
       border-radius: 20px;
+      border: 1px solid #fff;
+   }
+   .service-card h3{
+      margin-top: 20px;
    }
 
-   
-    
+
+
 }

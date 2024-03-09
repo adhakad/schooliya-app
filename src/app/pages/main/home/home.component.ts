@@ -76,16 +76,20 @@ export class HomeComponent implements OnInit {
         });
         jQuery('.topper-carousel').owlCarousel({
           items: 2,
-          loop: true,
           dots: false,
           nav: false,
+          loop: true,
+          autoplay: true,
+          autoplayTimeout: 5000,
           responsiveClass: true,
           responsive: {
             600: {
-              items: 5,
+              items: 6,
+              margin:100
             },
             1500: {
-              items: 5,
+              items: 6,
+              margin: 100,
             },
           }
         });
