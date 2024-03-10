@@ -1,5 +1,5 @@
 
-import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID, AfterViewInit, ElementRef } from '@angular/core';
 declare var jQuery: any;
 import { isPlatformBrowser } from '@angular/common';
 import { Banner } from 'src/app/modal/banner.model';
@@ -21,7 +21,7 @@ import { SchoolService } from 'src/app/services/school.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   private isBrowser: boolean = isPlatformBrowser(this.platformId);
   public baseUrl = environment.API_URL;
   bannerInfo: any[] = [];
@@ -43,7 +43,7 @@ export class HomeComponent implements OnInit {
   ];
 
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private schoolService: SchoolService, private printPdfService: PrintPdfService, private bannerService: BannerService, private topperService: TopperService, private testimonialService: TestimonialService, private adsService: AdsService, private studentAuthService: StudentAuthService) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private el: ElementRef, private schoolService: SchoolService, private printPdfService: PrintPdfService, private bannerService: BannerService, private topperService: TopperService, private testimonialService: TestimonialService, private adsService: AdsService, private studentAuthService: StudentAuthService) { }
 
   async ngOnInit() {
     this.getLoggedInStudentInfo();
@@ -66,7 +66,9 @@ export class HomeComponent implements OnInit {
         jQuery('.banner-carousel').owlCarousel({
           items: 1,
           autoplay: true,
-          autoplayTimeout: 5000,
+          slideTransition: 'linear',
+          autoplayTimeout: 0,
+          autoplaySpeed: 3000,
           autoplayHoverPause: false,
           loop: true,
           dots: false,
@@ -74,23 +76,26 @@ export class HomeComponent implements OnInit {
           nav: false,
           responsiveClass: true,
         });
-        jQuery('.topper-carousel').owlCarousel({
+        // jQuery('.topper-carousel').owlCarousel({
+        jQuery(this.el.nativeElement).find('.topper-carousel').owlCarousel({
           items: 2,
           dots: false,
           nav: false,
           loop: true,
           autoplay: true,
           autoplayTimeout: 5000,
+          autoplaySpeed:1500,
           responsiveClass: true,
           responsive: {
             600: {
               items: 6,
-              margin:100
+              margin: 100
             },
             1500: {
               items: 6,
               margin: 100,
             },
+            lazyLoad: true,             // Enable lazy loading
           }
         });
         jQuery('.ads-carousel').owlCarousel({
