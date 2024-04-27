@@ -13,9 +13,8 @@ export class AdminSignupComponent implements OnInit {
   classInfo:any;
   constructor(private fb: FormBuilder, public adminAuthService: AdminAuthService, private router: Router) {
     this.signupForm = this.fb.group({
-      email: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(30),Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
+      email: ['', [Validators.required, Validators.minLength(6)]],
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(30)]],
-      productKey: ['', [Validators.required,Validators.maxLength(40)]],
     });
   }
 

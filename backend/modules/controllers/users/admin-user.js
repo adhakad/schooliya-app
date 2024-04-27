@@ -1,8 +1,10 @@
 'use strict';
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const tokenService = require('../../services/admin-token');
 const AdminUserModel = require('../../models/users/admin-user');
 const SchoolKeyModel = require('../../models/users/school-key');
+
 
 let LoginAdmin = async (req, res, next) => {
     try {
@@ -47,41 +49,55 @@ let RefreshToken = async (req, res, next) => {
 }
 
 let SignupAdmin = async (req, res, next) => {
-    const { email, password, productKey } = req.body;
+    const { email, password ,name,mobile,city,state,address,pinCode,schoolName,affiliationNumber} = req.body;
     try {
-        const checkProductKey = await SchoolKeyModel.findOne({ status: 'Inactive' });
-        if (!checkProductKey) {
-            return res.status(400).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
-        }
-        const isProductKey = checkProductKey.productKey;
-        const productKeyMatch = await bcrypt.compare(productKey, isProductKey);
-        if (!productKeyMatch) {
-            return res.status(404).json({ errorMsg: 'Product key is invalid !' });
-        }
-        let countAdmin = await AdminUserModel.count();
-        if (countAdmin === 1) {
-            return res.status(400).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
-        }
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            auth: {
+                user: `dhakaddeepak9340700360@gmail.com`,
+                pass: 'cbgcwsgpajyhvztj'
+            },
+        });
+
         const checkUser = await AdminUserModel.findOne({ email: email });
         if (checkUser) {
-            return res.status(400).json({ errorMsg: "Username already exist !" });
+            return res.status(400).json({ errorMsg: "Email already exist !" });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         let adminData = {
             email: email,
             password: hashedPassword,
-            status: 'Active',
+            name:name,
+            mobile:mobile,
+            city:city,
+            state:state,
+            address:address,
+            pinCode:pinCode,
+            schoolName:schoolName,
+            affiliationNumber:affiliationNumber
+
         }
-        const objectId = checkProductKey._id;
-        let productKeyStatus = {
-            status: 'Active',
-        }
-        const updateProductKeyStatus = await SchoolKeyModel.findByIdAndUpdate(objectId, { $set: productKeyStatus }, { new: true });
-        if (updateProductKeyStatus) {
-            const createSignupAdmin = await AdminUserModel.create(adminData);
-            if (createSignupAdmin) {
-                return res.status(200).json({ successMsg: 'Admin register successfully.' });
-            }
+        const createSignupAdmin = await AdminUserModel.create(adminData);
+        if (createSignupAdmin) {
+            const otp = 589034;
+            const mailOptions = {
+                from: {
+                    name: 'Schooliya',
+                    address: 'dhakaddeepak9340700360@gmail.com'
+                },
+                to: `${email}`,
+                subject: 'Your OTP for email Verification',
+                html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                   <p style="color: #666;">You have requested an OTP to varify to your schooliya account. If this was you, please input the code below to continue.</p>
+                   <p style="color: #000;margin:10px;letter-spacing:2px;"><strong>${otp}</strong></p>
+                 </div>`
+            };
+            let info = await transporter.sendMail(mailOptions);
+            return res.status(200).json({ successMsg: 'Admin register successfully.' });
         }
     } catch (error) {
         return res.status(500).json({ errorMsg: 'Internal Server Error !' });
