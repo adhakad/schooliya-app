@@ -1,10 +1,22 @@
 'use strict';
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const speakeasy = require('speakeasy');
 const tokenService = require('../../services/admin-token');
 const AdminUserModel = require('../../models/users/admin-user');
+const OTPModel = require('../../models/otp');
 const SchoolKeyModel = require('../../models/users/school-key');
 
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+        user: `dhakaddeepak9340700360@gmail.com`,
+        pass: 'cbgcwsgpajyhvztj'
+    },
+});
 
 let LoginAdmin = async (req, res, next) => {
     try {
@@ -49,58 +61,90 @@ let RefreshToken = async (req, res, next) => {
 }
 
 let SignupAdmin = async (req, res, next) => {
-    const { email, password ,name,mobile,city,state,address,pinCode,schoolName,affiliationNumber} = req.body;
+    const secret = speakeasy.generateSecret({ length: 20 });
+    const { email, password, name, mobile, city, state, address, pinCode, schoolName, affiliationNumber } = req.body;
     try {
-
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: false,
-            auth: {
-                user: `dhakaddeepak9340700360@gmail.com`,
-                pass: 'cbgcwsgpajyhvztj'
-            },
-        });
 
         const checkUser = await AdminUserModel.findOne({ email: email });
         if (checkUser) {
             return res.status(400).json({ errorMsg: "Email already exist !" });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        let adminData = {
+        const adminData = {
             email: email,
             password: hashedPassword,
-            name:name,
-            mobile:mobile,
-            city:city,
-            state:state,
-            address:address,
-            pinCode:pinCode,
-            schoolName:schoolName,
-            affiliationNumber:affiliationNumber
+            name: name,
+            mobile: mobile,
+            city: city,
+            state: state,
+            address: address,
+            pinCode: pinCode,
+            schoolName: schoolName,
+            affiliationNumber: affiliationNumber
 
         }
-        const createSignupAdmin = await AdminUserModel.create(adminData);
-        if (createSignupAdmin) {
-            const otp = 589034;
+        const otpData = {
+            email: email,
+            secret: secret.base32,
+        }
+
+        const [createSignupAdmin, createOTP] = await Promise.all([
+            AdminUserModel.create(adminData),
+            OTPModel.create(otpData)
+        ]);
+        if (createSignupAdmin && createOTP) {
+            const token = speakeasy.totp({
+                secret: createOTP.secret,
+                encoding: 'base32'
+            });
             const mailOptions = {
                 from: {
                     name: 'Schooliya',
                     address: 'dhakaddeepak9340700360@gmail.com'
                 },
                 to: `${email}`,
-                subject: 'Your OTP for email Verification',
+                subject: 'OTP for email Verification',
                 html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
                    <p style="color: #666;">You have requested an OTP to varify to your schooliya account. If this was you, please input the code below to continue.</p>
-                   <p style="color: #000;margin:10px;letter-spacing:2px;"><strong>${otp}</strong></p>
+                   <p style="color: #000;margin:10px;letter-spacing:2px;"><strong>${token}</strong></p>
                  </div>`
             };
             let info = await transporter.sendMail(mailOptions);
-            return res.status(200).json({ successMsg: 'Admin register successfully.' });
+            return res.status(200).json({ successMsg: 'Admin register successfully.', email: email });
         }
     } catch (error) {
         return res.status(500).json({ errorMsg: 'Internal Server Error !' });
+    }
+}
+
+let VerifyOTP = async (req, res, next) => {
+    try {
+        const email = req.body.email;
+        const userEnteredOTP = parseInt(req.body.otp);
+        const user = await AdminUserModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: "Email does not exist!" });
+        }
+        const otp = await OTPModel.findOne({ email: email });
+        if (!otp) {
+            return res.status(404).json({ message: "Your OTP has expired!" });
+        }
+
+        const verified = speakeasy.totp.verify({
+            secret: otp.secret,
+            encoding: 'base32',
+            token: userEnteredOTP,
+            window: 6
+        });
+
+        if (!verified) {
+            return res.status(400).json({ message: "Invalid OTP" });
+
+        }
+        return res.status(200).json({ message: "OTP verified successfully" });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -174,4 +218,5 @@ module.exports = {
     SignupAdmin,
     VarifyForgotAdmin,
     ResetForgotAdmin,
+    VerifyOTP,
 }

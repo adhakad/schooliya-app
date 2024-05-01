@@ -18,6 +18,7 @@ export class PaymentComponent implements OnInit {
   classInfo: any;
   getOTP: Boolean = true;
   varifyOTP: Boolean = false;
+  email:String='';
   constructor(private fb: FormBuilder, public adminAuthService: AdminAuthService, private router: Router, private el: ElementRef, private renderer: Renderer2) {
     this.signupForm = this.fb.group({
       email: ['', [Validators.required, Validators.minLength(6)]],
@@ -32,6 +33,8 @@ export class PaymentComponent implements OnInit {
       affiliationNumber: ['', [Validators.required, Validators.maxLength(15)]],
     });
     this.otpForm = this.fb.group({
+      email: [''],
+      otp: [''],
       digit1: ['', Validators.required],
       digit2: ['', Validators.required],
       digit3: ['', Validators.required],
@@ -55,7 +58,7 @@ export class PaymentComponent implements OnInit {
   @HostListener('keydown', ['$event']) onKeyDown(event: KeyboardEvent) {
     const input = event.target as HTMLInputElement;
     const previousInput = input.previousElementSibling as HTMLInputElement;
-  
+
     if (event.key === 'Backspace' && !input.value) {
       if (previousInput) {
         previousInput.focus();
@@ -72,6 +75,7 @@ export class PaymentComponent implements OnInit {
     if (this.signupForm.valid) {
       this.adminAuthService.signup(this.signupForm.value).subscribe((res: any) => {
         if (res) {
+          this.email = res.email;
           this.getOTP = false;
           this.varifyOTP = true;
         }
@@ -85,7 +89,12 @@ export class PaymentComponent implements OnInit {
     if (this.otpForm.valid) {
       const otp = this.otpForm.value.digit1 + this.otpForm.value.digit2 + this.otpForm.value.digit3 +
         this.otpForm.value.digit4 + this.otpForm.value.digit5 + this.otpForm.value.digit6;
-        console.log(otp)
+      this.otpForm.value.email = this.email;
+      this.otpForm.value.otp = otp;
+      this.adminAuthService.varifyOTP(this.otpForm.value).subscribe((res: any) => {
+        if(res){
+        }
+      })
     }
   }
 
