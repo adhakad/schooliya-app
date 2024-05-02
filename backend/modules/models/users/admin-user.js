@@ -13,7 +13,7 @@ const AdminModel = mongoose.model('admin-users', {
         required: true,
         trim: true,
     },
-    varified:{
+    verified:{
         type:Boolean,
         default:false
     },

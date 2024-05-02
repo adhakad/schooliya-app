@@ -1,3 +1,7 @@
+.success-message {
+  color: #16b978;
+  font-size: 20px;
+}
 .error-msg h2 {
   color: rgb(228, 64, 154);
   font-size: 16px;
@@ -40,6 +44,13 @@
   box-shadow: 0 0 5px #804beb78;
 }
 
+.cards-second{
+  background-color: #fff;height: auto;margin-top: 30px;padding: 40px 40px 40px 40px;box-shadow: rgba(0, 0, 0, 0.05) 0px 3px 8px;border-radius: 5px;
+}
+.title{
+  color:#382066;font-size: 24px;font-weight: 600;letter-spacing: .5px;
+}
+
 
 @media (min-width: 992px) {
   .error-msg h2 {
@@ -76,6 +87,14 @@
     outline: none;
     border-color: #804beb;
     box-shadow: 0 0 5px #804beb78;
+  }
+
+  .cards-second{
+    padding: 60px 60px 60px 60px;
+  }
+
+  .title{
+    color:#382066;font-size: 28px;font-weight: 600;letter-spacing: .5px;
   }
 
 }

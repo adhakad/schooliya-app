@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, OnInit, Renderer2, Directive, HostListener } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, Renderer2, Directive, HostListener, AfterViewInit } from '@angular/core';
 declare var Razorpay: any;
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,13 +12,15 @@ import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 export class PaymentComponent implements OnInit {
 
   loader: Boolean = true;
+  successMsg: String = 'adsdfgfhg';
   errorMsg: string = '';
   signupForm: FormGroup;
   otpForm: FormGroup;
   classInfo: any;
   getOTP: Boolean = true;
   varifyOTP: Boolean = false;
-  email:String='';
+  email: String = '';
+  verified: Boolean = false;
   constructor(private fb: FormBuilder, public adminAuthService: AdminAuthService, private router: Router, private el: ElementRef, private renderer: Renderer2) {
     this.signupForm = this.fb.group({
       email: ['', [Validators.required, Validators.minLength(6)]],
@@ -66,6 +68,7 @@ export class PaymentComponent implements OnInit {
     }
   }
   ngOnInit(): void {
+
     setTimeout(() => {
       this.loader = false;
     }, 1000)
@@ -75,6 +78,7 @@ export class PaymentComponent implements OnInit {
     if (this.signupForm.valid) {
       this.adminAuthService.signup(this.signupForm.value).subscribe((res: any) => {
         if (res) {
+          this.errorMsg = '';
           this.email = res.email;
           this.getOTP = false;
           this.varifyOTP = true;
@@ -92,10 +96,16 @@ export class PaymentComponent implements OnInit {
       this.otpForm.value.email = this.email;
       this.otpForm.value.otp = otp;
       this.adminAuthService.varifyOTP(this.otpForm.value).subscribe((res: any) => {
-        if(res){
+        if (res) {
+          this.errorMsg = '';
+          this.verified = res.verified;
+          this.successMsg = res.successMsg;
         }
+
+      }, err => {
+        this.errorMsg = err.error.errorMsg;
       })
     }
-  }
 
+  }
 }

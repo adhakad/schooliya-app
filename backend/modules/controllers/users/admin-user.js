@@ -63,58 +63,58 @@ let RefreshToken = async (req, res, next) => {
 let SignupAdmin = async (req, res, next) => {
     const secret = speakeasy.generateSecret({ length: 20 });
     const { email, password, name, mobile, city, state, address, pinCode, schoolName, affiliationNumber } = req.body;
+
     try {
+        const existingUser = await AdminUserModel.findOne({ email });
 
-        const checkUser = await AdminUserModel.findOne({ email: email });
-        if (checkUser) {
-            return res.status(400).json({ errorMsg: "Email already exist !" });
+        if (existingUser) {
+            return res.status(400).json({ errorMsg: "Email already exists!" });
         }
+
         const hashedPassword = await bcrypt.hash(password, 10);
-        const adminData = {
-            email: email,
+
+        const userData = {
+            email,
             password: hashedPassword,
-            name: name,
-            mobile: mobile,
-            city: city,
-            state: state,
-            address: address,
-            pinCode: pinCode,
-            schoolName: schoolName,
-            affiliationNumber: affiliationNumber
+            name,
+            mobile,
+            city,
+            state,
+            address,
+            pinCode,
+            schoolName,
+            affiliationNumber
+        };
 
-        }
-        const otpData = {
-            email: email,
-            secret: secret.base32,
-        }
-
-        const [createSignupAdmin, createOTP] = await Promise.all([
-            AdminUserModel.create(adminData),
-            OTPModel.create(otpData)
+        const [createdUser, createdOTP] = await Promise.all([
+            AdminUserModel.create(userData),
+            OTPModel.create({ email, secret: secret.base32 })
         ]);
-        if (createSignupAdmin && createOTP) {
-            const token = speakeasy.totp({
-                secret: createOTP.secret,
-                encoding: 'base32'
-            });
-            const mailOptions = {
-                from: {
-                    name: 'Schooliya',
-                    address: 'dhakaddeepak9340700360@gmail.com'
-                },
-                to: `${email}`,
-                subject: 'OTP for email Verification',
-                html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-                   <p style="color: #666;">You have requested an OTP to varify to your schooliya account. If this was you, please input the code below to continue.</p>
-                   <p style="color: #000;margin:10px;letter-spacing:2px;"><strong>${token}</strong></p>
-                 </div>`
-            };
-            let info = await transporter.sendMail(mailOptions);
-            return res.status(200).json({ successMsg: 'Admin register successfully.', email: email });
-        }
+
+        const token = speakeasy.totp({
+            secret: createdOTP.secret,
+            encoding: 'base32'
+        });
+
+        const mailOptions = {
+            from: { name: 'Schooliya', address: 'dhakaddeepak9340700360@gmail.com' },
+            to: email,
+            subject: 'OTP for Email Verification',
+            html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+            <p style="color: #666;">You have requested an OTP to verify your Schooliya account. If this was you, please input the code below to continue.</p>
+            <p style="color: #000;margin:10px;letter-spacing:2px;"><strong>${token}</strong></p>
+        </div>`
+        };
+
+        transporter.sendMail(mailOptions).then(() => {
+            res.status(200).json({ successMsg: 'Admin registered successfully.', email });
+        }).catch((error) => {
+            res.status(500).json({ errorMsg: 'Error in sending email!' });
+        });
     } catch (error) {
-        return res.status(500).json({ errorMsg: 'Internal Server Error !' });
+        return res.status(500).json({ errorMsg: 'Internal Server Error!' });
     }
+
 }
 
 let VerifyOTP = async (req, res, next) => {
@@ -123,11 +123,11 @@ let VerifyOTP = async (req, res, next) => {
         const userEnteredOTP = parseInt(req.body.otp);
         const user = await AdminUserModel.findOne({ email: email });
         if (!user) {
-            return res.status(404).json({ message: "Email does not exist!" });
+            return res.status(404).json({ successMsg: "Email does not exist!" });
         }
         const otp = await OTPModel.findOne({ email: email });
         if (!otp) {
-            return res.status(404).json({ message: "Your OTP has expired!" });
+            return res.status(404).json({ successMsg: "Your OTP has expired!" });
         }
 
         const verified = speakeasy.totp.verify({
@@ -138,13 +138,17 @@ let VerifyOTP = async (req, res, next) => {
         });
 
         if (!verified) {
-            return res.status(400).json({ message: "Invalid OTP" });
+            return res.status(400).json({ successMsg: "Invalid OTP" });
 
         }
-        return res.status(200).json({ message: "OTP verified successfully" });
+        const objectId = user._id;
+        let update = await AdminUserModel.findByIdAndUpdate(objectId, { $set: { verified: true } }, { new: true });
+        if (update) {
+            return res.status(200).json({ successMsg: "Congratulations! Your email has been successfully verified. You can now proceed with your payment.", verified: true });
+        }
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ successMsg: "Internal server error" });
     }
 }
 
