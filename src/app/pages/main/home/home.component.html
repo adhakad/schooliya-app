@@ -103,12 +103,12 @@
                             <div class="col-12 col-lg-4 pricing-card-container">
                                 <div class="pricing-card">
                                     <div class="pricing-title">
-                                        <h2>Standard</h2>
+                                        <h2>{{plansInfo[0]?.plans}}</h2>
                                         <p>Everything you need to create your website</p>
                                     </div>
-                                    <h3><span style="font-size:22px;font-weight: 500;">&#8377;</span> 1999<span
-                                            style="font-size: medium;font-weight: 500;"> / 1st Year</span></h3>
-                                    <button class="pricing-button" mat-raised-button routerLink="payment">Add to Cart</button>
+                                    <h3><span style="font-size:22px;font-weight: 500;">&#8377;</span> {{plansInfo[0]?.price}}<span
+                                            style="font-size: medium;font-weight: 500;"> / Yearly</span></h3>
+                                    <button class="pricing-button" mat-raised-button routerLink="/admin/payment/{{plansInfo[0]?._id}}">Buy Now</button>
                                     <div class="pricing-amount">
                                         <p>₹ 4999/year when you renew</p>
                                     </div>
@@ -130,12 +130,12 @@
                                 <div class="pricing-card">
                                     <!-- <div class="pricing-card" style="border:2px solid #a77bff;"> -->
                                     <div class="pricing-title">
-                                        <h2>Advanced</h2>
+                                        <h2>{{plansInfo[1]?.plans}}</h2>
                                         <p>Level-up with more power and enhanced features</p>
                                     </div>
-                                    <h3><span style="font-size:22px;font-weight: 500;">&#8377;</span>2999<span
-                                            style="font-size: medium;font-weight: 500;"> / 1st Year</span></h3>
-                                    <button class="pricing-button" mat-raised-button routerLink="payment">Add to Cart</button>
+                                    <h3><span style="font-size:22px;font-weight: 500;">&#8377;</span> {{plansInfo[1]?.price}}<span
+                                            style="font-size: medium;font-weight: 500;"> / Yearly</span></h3>
+                                    <button class="pricing-button" mat-raised-button routerLink="/admin/payment/{{plansInfo[1]?._id}}">Buy Now</button>
                                     <div class="pricing-amount">
                                         <p>₹ 4999/year when you renew</p>
                                     </div>
@@ -147,7 +147,7 @@
                                                 Module,Admit Card and Result Module,Transfer Certificate Or TC
                                                 Module,Class Promote,Notifications,Class and Subjects
                                                 Listing,Website Module etc.)</span></p>
-                                        <p>Student Listing<span> (Upto 300)</span></p>
+                                        <p>Student Listing<span> (Upto 500)</span></p>
                                         <p>Custom Support<span> Performance</span></p>
                                         <p>Custom Support<span> Performance</span></p>
                                     </div>
@@ -156,12 +156,12 @@
                             <div class="col-12 col-lg-4 pricing-card-container">
                                 <div class="pricing-card">
                                     <div class="pricing-title">
-                                        <h2>Pro</h2>
+                                        <h2>{{plansInfo[2]?.plans}}</h2>
                                         <p>Enjoy optimised performance & guaranteed resources</p>
                                     </div>
-                                    <h3><span style="font-size:22px;font-weight: 500;">&#8377;</span> 3999<span
-                                            style="font-size: medium;font-weight: 500;"> / 1st Year</span></h3>
-                                    <button class="pricing-button" mat-raised-button routerLink="payment">Add to Cart</button>
+                                    <h3><span style="font-size:22px;font-weight: 500;">&#8377;</span> {{plansInfo[2]?.price}}<span
+                                            style="font-size: medium;font-weight: 500;"> / Yearly</span></h3>
+                                    <button class="pricing-button" mat-raised-button routerLink="/admin/payment/{{plansInfo[2]?._id}}">Buy Now</button>
                                     <div class="pricing-amount">
                                         <p>₹ 4999/year when you renew</p>
                                     </div>

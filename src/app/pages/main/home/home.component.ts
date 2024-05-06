@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 import { BannerService } from 'src/app/services/banner.service';
 import { AdsService } from 'src/app/services/ads.service';
 import { TopperService } from 'src/app/services/topper.service';
+import { PlansService } from 'src/app/services/plans.service';
 import { TestimonialService } from 'src/app/services/testimonial.service';
 import { StudentAuthService } from 'src/app/services/auth/student-auth.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
@@ -28,6 +29,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   teacherInfo: any[] = [];
   adsInfo: any[] = [];
   topperInfo: any[] = [];
+  plansInfo: any[] = [];
   testimonialInfo: any[] = [];
   cls: number = 0;
   loggedInStudentInfo: any;
@@ -43,10 +45,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
   ];
 
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private el: ElementRef, private schoolService: SchoolService, private printPdfService: PrintPdfService, private bannerService: BannerService, private topperService: TopperService, private testimonialService: TestimonialService, private adsService: AdsService, private studentAuthService: StudentAuthService) { }
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private el: ElementRef, private schoolService: SchoolService, private printPdfService: PrintPdfService, private plansService: PlansService, private bannerService: BannerService, private topperService: TopperService, private testimonialService: TestimonialService, private adsService: AdsService, private studentAuthService: StudentAuthService) { }
 
   async ngOnInit() {
     this.getLoggedInStudentInfo();
+    this.getPlans();
     this.getBanner();
     this.getAds()
     this.getTestimonial();
@@ -75,7 +78,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
           margin: 0,
           nav: false,
           responsiveClass: true,
-          lazyLoad: true,  
+          lazyLoad: true,
         });
         // jQuery('.topper-carousel').owlCarousel({
         jQuery(this.el.nativeElement).find('.topper-carousel').owlCarousel({
@@ -85,9 +88,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
           loop: true,
           autoplay: true,
           autoplayTimeout: 5000,
-          autoplaySpeed:1500,
+          autoplaySpeed: 1500,
           responsiveClass: true,
-          lazyLoad: true,  
+          lazyLoad: true,
           responsive: {
             600: {
               items: 6,
@@ -152,7 +155,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     }
   }
-
+  getPlans() {
+    this.plansService.getPlansList().subscribe((res: any[]) => {
+      if (res) {
+        this.plansInfo = res;
+        console.log(this.plansInfo)
+      }
+    })
+  }
   getBanner() {
     this.schoolService.getSchool().subscribe((res: any) => {
       if (res) {
@@ -190,6 +200,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
       }
     })
   }
+
+
 
 
 

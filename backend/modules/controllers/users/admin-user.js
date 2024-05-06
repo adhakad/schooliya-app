@@ -20,25 +20,25 @@ const transporter = nodemailer.createTransport({
 
 let LoginAdmin = async (req, res, next) => {
     try {
-        let admin = await AdminUserModel.findOne({ email: req.body.email });
+        let { email, password } = req.body;
+        let admin = await AdminUserModel.findOne({ email: email });
         if (!admin) {
             return res.status(404).json({ errorMsg: 'Username or password invalid !' });
         }
-        const passwordMatch = await bcrypt.compare(req.body.password, admin.password);
-
+        const passwordMatch = await bcrypt.compare(password, admin.password);
         if (!passwordMatch) {
             return res.status(404).json({ errorMsg: 'Username or password invalid !' });
         }
-        if (admin.status == "Inactive") {
-            return res.status(400).json({ errorMsg: 'Application access permissions denied, please contact app development company !' });
-        }
-        if (admin.status == "Active") {
-            const payload = { id: admin._id, email: admin.email };
-            const accessToken = await tokenService.getAccessToken(payload);
-            const refreshToken = await tokenService.getRefreshToken(payload);
-            return res.status(200).json({ adminInfo: admin, accessToken, refreshToken });
-        }
-        return res.status(400).json({ errorMsg: 'Login error !' })
+        // if (admin.status == "Inactive") {
+        //     return res.status(400).json({ errorMsg: 'Application access permissions denied, please contact app development company !' });
+        // }
+        // if (admin.status == "Active") {
+        const payload = { id: admin._id, email: admin.email };
+        const accessToken = await tokenService.getAccessToken(payload);
+        const refreshToken = await tokenService.getRefreshToken(payload);
+        return res.status(200).json({ adminInfo: admin, accessToken, refreshToken });
+        // }
+        // return res.status(400).json({ errorMsg: 'Login error !' })
     } catch (error) {
         return res.status(500).json({ errorMsg: 'Internal Server Error !' });
     }
@@ -144,7 +144,7 @@ let VerifyOTP = async (req, res, next) => {
         const objectId = user._id;
         let update = await AdminUserModel.findByIdAndUpdate(objectId, { $set: { verified: true } }, { new: true });
         if (update) {
-            return res.status(200).json({ successMsg: "Congratulations! Your email has been successfully verified. You can now proceed with your payment.", verified: true });
+            return res.status(200).json({ successMsg: "Congratulations! Your email has been successfully verified. You can now proceed with your payment.", verified: true, adminInfo: user });
         }
     } catch (err) {
         console.error(err);

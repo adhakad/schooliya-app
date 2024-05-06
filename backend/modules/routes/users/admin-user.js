@@ -1,7 +1,7 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const { LoginAdmin, RefreshToken, SignupAdmin, VarifyForgotAdmin, ResetForgotAdmin,VerifyOTP } = require('../../controllers/users/admin-user');
+const { LoginAdmin, RefreshToken, SignupAdmin, VarifyForgotAdmin, ResetForgotAdmin,VerifyOTP} = require('../../controllers/users/admin-user');
 
 router.post('/login', LoginAdmin);
 router.post('/refresh', RefreshToken);

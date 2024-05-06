@@ -8,17 +8,22 @@ const paymentSchema = new Schema({
     required: true,
     trim: true
   },
-  adminId: {
+  studentId: {
     type: String,
     required: true,
     trim: true
   },
-  activePlan:{
-    type:String,
-    required:true,
-    trim:true
+  class: {
+    type: Number,
+    required: true,
+    trim: true
   },
-  amount: {
+  feesInstallment: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  feesAmount: {
     type: Number,
     required: true,
     trim: true

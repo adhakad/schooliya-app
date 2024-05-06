@@ -174,4 +174,14 @@ export class AdminAuthService {
     this.cookieService.delete("_vN");
   }
 
+  deleteAccessRefreshToken() {
+    this.token = null;
+    this.isAdminAuthenticated = false;
+    this.authStatusListener.next(false);
+    this.cookieService.delete("adminAccessToken");
+    this.cookieService.delete("adminRefreshToken");
+    this.cookieService.delete("_uD");
+    this.cookieService.delete("_vN");
+  }
+
 }

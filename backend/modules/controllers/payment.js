@@ -1,11 +1,10 @@
 'use strict';
-const { KEY_ID,KEY_SECRET } = process.env;
+const { KEY_ID, KEY_SECRET } = process.env;
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const { DateTime } = require('luxon');
-const FeesCollectionModel = require('../models/fees-collection');
-const FeesStructureModel = require('../models/fees-structure');
 const Payment = require('../models/payment');
+const tokenService = require('../services/admin-token');
 const key_id = KEY_ID;
 const key_secret = KEY_SECRET;
 
@@ -15,20 +14,18 @@ const razorpay = new Razorpay({
 });
 
 let CreatePayment = async (req, res) => {
-  const { studentId, name, cls, feesInstallment, feesAmount, currency } = req.body;
+  const { adminId, activePlan, amount, currency } = req.body;
   const paymentData = {
-    amount: feesAmount * 100,
+    amount: amount * 100,
     currency: currency,
   };
   try {
     const order = await razorpay.orders.create(paymentData);
     const payment = new Payment({
-      studentId: studentId,
-      name: name,
+      adminId: adminId,
+      activePlan: activePlan,
       orderId: order.id,
-      class: cls,
-      feesInstallment: feesInstallment,
-      feesAmount: feesAmount,
+      amount: amount,
       currency,
     });
     await payment.save();
@@ -43,6 +40,12 @@ let ValidatePayment = async (req, res) => {
     const paymentId = req.body.payment_id;
     const orderId = req.body.order_id;
     const signature = req.body.signature;
+    const email = req.body.email;
+    const id = req.body.id;
+    const adminInfo = {
+      id:id,
+      email:email,
+    }
     const secretKey = 'TVIz565DG7GB1kzF4Q8uVayK'
     const body = orderId + "|" + paymentId;
     const expectedSignature = crypto
@@ -55,33 +58,11 @@ let ValidatePayment = async (req, res) => {
         { status: 'success', },
         { new: true }
       );
-      if (updatedPayment) {
-        const studentId = updatedPayment.studentId;
-        const className = updatedPayment.class;
-        let feesAmount = updatedPayment.feesAmount;
-        let feesInstallment = updatedPayment.feesInstallment;
-        let receiptNo = Math.floor(Math.random() * 899999 + 100000);
-        const currentDateIst = DateTime.now().setZone('Asia/Kolkata');
-        const istDateTimeString = currentDateIst.toFormat('dd-MM-yyyy hh:mm:ss a');
-        const checkFeesCollection = await FeesCollectionModel.findOne({ studentId: studentId, class: className });
-        const id = checkFeesCollection._id;
-        const totalFees = checkFeesCollection.totalFees;
-        const installments = checkFeesCollection.installment;
-        const admissionFees = checkFeesCollection.admissionFees;
-        const totalInstallment = installments.reduce((acc, installment) => {
-          const value = Object.values(installment)[0];
-          return acc + value;
-        }, 0);
-        const paidFees = totalInstallment + feesAmount + admissionFees;
-        const dueFees = totalFees - paidFees;
-        const updatedDocument = await FeesCollectionModel.findOneAndUpdate(
-          { _id: id, 'installment': { $elemMatch: { [feesInstallment]: { $exists: true } } }, 'receipt': { $elemMatch: { [feesInstallment]: { $exists: true } } }, 'paymentDate': { $elemMatch: { [feesInstallment]: { $exists: true } } } },
-          { $set: { [`installment.$.${feesInstallment}`]: feesAmount, [`receipt.$.${feesInstallment}`]: receiptNo, [`paymentDate.$.${feesInstallment}`]: istDateTimeString, paidFees: paidFees, dueFees: dueFees } },
-          { new: true }
-        );
-        if (updatedDocument) {
-          return res.status(200).json({ success: true, message: 'Payment successfully validated.' });
-        }
+      const payload = { id: id, email: email };
+      const accessToken = await tokenService.getAccessToken(payload);
+      const refreshToken = await tokenService.getRefreshToken(payload);
+      if (updatedPayment && accessToken && refreshToken) {
+        return res.status(200).json({ success: true,adminInfo: adminInfo, accessToken, refreshToken, message: 'Payment successfully validated.' });
       }
       if (!updatedPayment) {
         return res.status(400).json({ success: false, message: 'Failed to update payment status !' });
@@ -89,7 +70,6 @@ let ValidatePayment = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Payment validation failed !' });
     }
   } catch (error) {
-    console.error('Error validating payment:', error);
     return res.status(500).json({ success: false, message: 'Error validating payment !' });
   }
 }
