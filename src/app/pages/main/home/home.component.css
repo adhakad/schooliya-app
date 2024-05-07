@@ -3,8 +3,72 @@
 }
 
 .banner {
-   min-height: 85vh;
-   background-image: linear-gradient(-225deg, rgb(27, 3, 48) 20%,rgb(27, 3, 48) 20%, rgb(123, 36, 186) 73%, rgb(28, 4, 57) 98%);
+   min-height: 75vh;
+   background-image: linear-gradient(-225deg, rgb(27, 3, 48) 20%, rgb(27, 3, 48) 20%, rgb(123, 36, 186) 73%, rgb(28, 4, 57) 98%);
+}
+
+.banner h3 {
+   font-size: 28px;
+   font-family: 'Segoe UI', Verdana;
+   font-weight: 400;
+   letter-spacing: .5px;
+   color: #fff;
+}
+
+.banner h3 span {
+   background: linear-gradient(to right, #8C52FF, #fff, #fff);
+   -webkit-text-fill-color: transparent;
+   -webkit-background-clip: text;
+}
+
+.banner h2 {
+   color: #fff;
+   font-size: 42px;
+   font-family: 'Segoe UI', Verdana;
+   font-weight: 700;
+   letter-spacing: 1px;
+   margin-top: 10px;
+   line-height: 50px;
+}
+
+.banner p {
+   font-size: 18px;
+   font-family: 'Segoe UI', Verdana;
+   font-weight: 400;
+   color: rgb(30, 16, 56);
+   color: #fff;
+   margin-top: 15px;
+   line-height: 25px;
+}
+
+.banner button {
+   width: 150px;
+   background-color: #fff;
+   color: #4A2B89;
+   box-shadow: 0 0 1px -10px #8C52FF,
+      0 0 0 0,
+      0 0 5px 0 #8c52ff3c !important;
+   border-radius: 20px;
+   padding: 5px 5px 5px 5px;
+   margin-top: 20px;
+}
+
+.banner .img-section {
+   padding: 0px 0 0 0px;
+}
+
+.banner .img-section .img-section-row {
+   width: 410px;
+   height: 410px;
+   background-color: transparent;
+   border-radius: 50%;
+}
+
+.banner .img-section img {
+   width: 92%;
+   height: 62%;
+   margin-top: 6vh;
+   margin-left: 4%;
 }
 
 .box div {
@@ -87,10 +151,82 @@
    }
 }
 
+.customer-section {
+   background: linear-gradient(to right, rgb(203, 193, 255), rgb(234, 230, 255));
+   /* background-size: .5px .5px;  */
+   padding-top: 55px;
+   padding-bottom: 55px;
+}
+
+.customer-section h3 {
+   font-family: 'Segoe UI', Verdana;
+   color: #382066;
+   font-size: 28px;
+   font-weight: 400;
+   letter-spacing: .5px;
+   text-align: center;
+   margin-top: 20px;
+}
+
+.customer-section h2 {
+   font-family: 'Segoe UI', Verdana;
+   font-size: 32px;
+   font-weight: 700;
+   color: #382066;
+   letter-spacing: .5px;
+   text-align: center;
+   margin-top: 20px;
+}
+
+.customer-section p {
+   font-family: 'Segoe UI', Verdana;
+   color: #77779f;
+   font-size: 16px;
+   font-weight: 500;
+   letter-spacing: .5px;
+   text-align: center;
+   margin-top: 20px;
+   margin-bottom: 50px;
+}
+
+.customer-section .container-fluid {
+   padding-left: 0 !important;
+   padding-right: 0 !important;
+}
+
+.topper-card {
+   width: 115px;
+   height: 115px;
+   background-color: #f0eeff;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   text-align: center;
+   border: 1px solid #fcfcfc;
+   border-radius: 50%;
+}
+
+.topper-card img {
+   width: 50% !important;
+   height: 50% !important;
+   text-align: center;
+   align-items: center;
+}
+
+.topper-card h3 {
+   color: #382066;
+   font-size: 16px;
+   font-weight: 500;
+   margin-top: 20px;
+
+}
+
+
+
 .pricing-section {
    min-height: 550px;
-   background-image:radial-gradient(rgb(203, 195, 255) .5px, rgb(181, 170, 255) .5px);
-   /* background-size: 5px 5px; */
+   background-image: radial-gradient(rgb(203, 195, 255) .5px, rgb(181, 170, 255) .5px);
    padding-bottom: 75px !important;
 
 }
@@ -116,6 +252,110 @@
    height: 62vh;
    margin-bottom: 30px;
    border-radius: 25px;
+}
+
+
+
+.pricing-card-container {
+   padding-left: 20px;
+   padding-right: 20px;
+}
+
+.pricing-card {
+   background-color: #f0eeff;
+   width: 100%;
+   height: auto;
+   padding: 30px;
+   border-radius: 5px;
+   border: 1px solid #fff;
+   /* box-shadow: 0 0 1px -10px #e4d4ff,
+      0 0 0 0 #e4d4ff,
+      0 0 20px 0 #ede3ff; */
+}
+
+.pricing-card h2 {
+   color: #382066;
+   text-align: center;
+   font-family: 'Segoe UI', Verdana;
+   font-size: 25px;
+   font-weight: 700;
+   letter-spacing: .75px;
+}
+
+.pricing-card .pricing-title {
+   min-height: 110px;
+}
+
+.pricing-card p {
+   color: #382066;
+   text-align: center;
+   text-align: center;
+   font-family: 'Segoe UI', Verdana;
+   font-size: 15px;
+   font-weight: 400;
+}
+
+.pricing-card h3 {
+   color: #382066;
+   text-align: center;
+   font-family: 'Segoe UI', Verdana;
+   font-size: 30px;
+   font-weight: 700;
+   letter-spacing: .75px;
+}
+
+.pricing-button {
+   height: 50px;
+   background: #8C52FF;
+   font-size: 16px;
+   font-weight: 500;
+   color: #FFF;
+   box-shadow: none !important;
+   margin-top: 20px;
+   padding-left: 85px;
+   padding-right: 85px;
+   text-align: center;
+}
+
+.pricing-button.mat-button-disabled:not([class*=mat-elevation-z]) {
+   /* background: #e7e6f897;
+   color: #8C52FF9a; */
+   background: #ebebff;
+   color: #4e4caacd;
+   cursor: not-allowed;
+}
+
+.pricing-card .pricing-amount p {
+   margin-top: 15px;
+   margin-bottom: 25px;
+   color: #392066dd;
+}
+
+.mat-divider {
+   background-color: #e1d2ff;
+   height: 1.5px;
+
+}
+
+.pricing-feature h3 {
+   font-size: 18px;
+   font-weight: 700;
+   text-align: left;
+   margin-top: 20px;
+}
+
+.pricing-feature p {
+   font-size: .85rem;
+   font-weight: 700;
+   text-align: left;
+   margin-top: 20px;
+}
+
+.pricing-feature span {
+   font-size: .85rem;
+   font-weight: 600;
+   text-align: left;
+   margin-top: 20px;
 }
 
 .service-section {
@@ -148,12 +388,63 @@
 }
 
 
+.service-section {
+   background: rgb(236, 232, 255);
+}
+.service-section .img-section{
+   background-color: #a476ff;padding: 80px;margin: 0px 5px 50px 5px;border-radius: 20px;
+}
+.service-card-container {
+   /* padding-left: 40px;
+   padding-right: 40px; */
+}
 
+.service-card {
+   background: linear-gradient(to right, #c5beff, #e3dfff, #e3dfff);
+   width: 100%;
+   height: 15vh;
+   text-align: center;
+   margin-bottom: 30px;
+   border-radius: 20px;
+   border: 1px solid #fff;
+}
+
+.service-card h3 {
+   color: #7239dd;
+   font-size: 16px;
+   font-weight: 500;
+   margin-top: 20px;
+}
+
+.service-card p {
+   color: #7239dd;
+   font-size: 12px;
+   font-weight: 400;
+   margin-top: -10px !important;
+}
 
 
 
 
 @media (min-width: 992px) {
+   .banner .img-section {
+      padding: 100px 0 0 120px;
+   }
+   
+   .banner .img-section .img-section-row {
+      width: 410px;
+      height: 410px;
+      background-color: transparent;
+      border-radius: 50%;
+   }
+   
+   .banner .img-section img {
+      width: 100%;
+      height: 65%;
+      margin-top: 5vh;
+      margin-left: 10%;
+   }
+   
    .pricing-card-container {
       padding-left: 20px;
       padding-right: 20px;
@@ -294,6 +585,11 @@
       margin-bottom: 50px;
    }
 
+   .customer-section .container-fluid {
+      padding-left: 25px !important;
+      padding-right: 25px !important;
+   }
+
    .topper-card {
       width: 150px;
       height: 150px;
@@ -323,16 +619,18 @@
    }
 
    .service-section {
-      background:  rgb(236, 232, 255);
+      background: rgb(236, 232, 255);
    }
 
    .service-card-container {
       /* padding-left: 40px;
       padding-right: 40px; */
    }
-
+   .service-section .img-section{
+      background-color: #a476ff;padding: 100px;margin: 75px 0px 0px 0px;
+   }
    .service-card {
-      background:linear-gradient(to right,#c5beff,#e3dfff,#e3dfff);
+      background: linear-gradient(to right, #c5beff, #e3dfff, #e3dfff);
       width: 100%;
       height: 15vh;
       text-align: center;
@@ -340,14 +638,16 @@
       border-radius: 20px;
       border: 1px solid #fff;
    }
-   .service-card h3{
-      color:#7239dd;
+
+   .service-card h3 {
+      color: #7239dd;
       font-size: 16px;
       font-weight: 500;
       margin-top: 20px;
    }
-   .service-card p{
-      color:#7239dd;
+
+   .service-card p {
+      color: #7239dd;
       font-size: 12px;
       font-weight: 400;
       margin-top: -10px !important;

@@ -82,7 +82,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         });
         // jQuery('.topper-carousel').owlCarousel({
         jQuery(this.el.nativeElement).find('.topper-carousel').owlCarousel({
-          items: 2,
+          items: 3,
           dots: false,
           nav: false,
           loop: true,
@@ -91,6 +91,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
           autoplaySpeed: 1500,
           responsiveClass: true,
           lazyLoad: true,
+          margin: 115,
           responsive: {
             600: {
               items: 6,
