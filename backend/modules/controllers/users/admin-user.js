@@ -90,44 +90,47 @@ let SignupAdmin = async (req, res, next) => {
             AdminUserModel.create(userData),
             OTPModel.create({ email, secret: secret.base32 })
         ]);
-
         const token = speakeasy.totp({
             secret: createdOTP.secret,
             encoding: 'base32'
         });
-
-        const mailOptions = {
-            from: { name: 'Schooliya', address: 'dhakaddeepak9340700360@gmail.com' },
-            to: email,
-            subject: 'OTP for Email Verification',
-            html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
-            <p style="color: #666;">You have requested an OTP to verify your Schooliya account. If this was you, please input the code below to continue.</p>
-            <p style="color: #000;margin:10px;letter-spacing:2px;"><strong>${token}</strong></p>
-        </div>`
-        };
-
-        transporter.sendMail(mailOptions).then(() => {
-            res.status(200).json({ successMsg: 'Admin registered successfully.', email });
-        }).catch((error) => {
-            res.status(500).json({ errorMsg: 'Error in sending email!' });
-        });
+        sendEmail(email, token);
+        return res.status(200).json({ successMsg: 'Admin registered successfully.', email });
     } catch (error) {
         return res.status(500).json({ errorMsg: 'Internal Server Error!' });
     }
 
 }
 
+async function sendEmail(email, token) {
+    const mailOptions = {
+        from: { name: 'Schooliya', address: 'dhakaddeepak9340700360@gmail.com' },
+        to: email,
+        subject: 'OTP for Email Verification',
+        html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+        <p style="color: #666;">You have requested an OTP to verify your Schooliya account. If this was you, please input the code below to continue.</p>
+        <p style="color: #000;margin:10px;letter-spacing:2px;"><strong>${token}</strong></p>
+    </div>`
+    };
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        res.status(500).json({errorMsg: 'Error sending email !' });
+    }
+}
+
 let VerifyOTP = async (req, res, next) => {
+    
     try {
         const email = req.body.email;
         const userEnteredOTP = parseInt(req.body.otp);
         const user = await AdminUserModel.findOne({ email: email });
         if (!user) {
-            return res.status(404).json({ successMsg: "Email does not exist!" });
+            return res.status(404).json({ errorMsg: "Email does not exist!" });
         }
         const otp = await OTPModel.findOne({ email: email });
         if (!otp) {
-            return res.status(404).json({ successMsg: "Your OTP has expired!" });
+            return res.status(404).json({ errorMsg: "Your OTP has expired!" });
         }
 
         const verified = speakeasy.totp.verify({
@@ -138,7 +141,7 @@ let VerifyOTP = async (req, res, next) => {
         });
 
         if (!verified) {
-            return res.status(400).json({ successMsg: "Invalid OTP" });
+            return res.status(400).json({ errorMsg: "Invalid OTP" });
 
         }
         const objectId = user._id;
@@ -148,7 +151,7 @@ let VerifyOTP = async (req, res, next) => {
         }
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ successMsg: "Internal server error" });
+        return res.status(500).json({ errorMsg: "Internal server error" });
     }
 }
 

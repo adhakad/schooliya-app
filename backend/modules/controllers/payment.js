@@ -3,6 +3,7 @@ const { KEY_ID, KEY_SECRET } = process.env;
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const { DateTime } = require('luxon');
+const nodemailer = require('nodemailer');
 const Payment = require('../models/payment');
 const tokenService = require('../services/admin-token');
 const key_id = KEY_ID;
@@ -12,6 +13,18 @@ const razorpay = new Razorpay({
   key_id: key_id,
   key_secret: key_secret,
 });
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: `dhakaddeepak9340700360@gmail.com`,
+    pass: 'cbgcwsgpajyhvztj'
+  },
+});
+
 
 let CreatePayment = async (req, res) => {
   const { adminId, activePlan, amount, currency } = req.body;
@@ -31,46 +44,56 @@ let CreatePayment = async (req, res) => {
     await payment.save();
     res.status(200).json({ order });
   } catch (error) {
-    res.status(500).json({ error: 'Payment creation failed !' });
+    res.status(500).json({ errorMsg: 'Payment creation failed !' });
   }
 };
 
 let ValidatePayment = async (req, res) => {
   try {
-    const paymentId = req.body.payment_id;
-    const orderId = req.body.order_id;
-    const signature = req.body.signature;
-    const email = req.body.email;
-    const id = req.body.id;
-    const adminInfo = {
-      id:id,
-      email:email,
+    const { payment_id: paymentId, order_id: orderId, signature, email, id } = req.body;
+    const adminInfo = { id, email };
+    const secretKey = 'TVIz565DG7GB1kzF4Q8uVayK';
+    const body = `${orderId}|${paymentId}`;
+    const expectedSignature = crypto.createHmac("sha256", secretKey).update(body).digest("hex");
+
+    if (expectedSignature !== signature) {
+      throw new Error('Invalid signature');
     }
-    const secretKey = 'TVIz565DG7GB1kzF4Q8uVayK'
-    const body = orderId + "|" + paymentId;
-    const expectedSignature = crypto
-      .createHmac("sha256", secretKey)
-      .update(body.toString())
-      .digest("hex");
-    if (expectedSignature === signature) {
-      const updatedPayment = await Payment.findOneAndUpdate(
-        { orderId: orderId },
-        { status: 'success', },
-        { new: true }
-      );
-      const payload = { id: id, email: email };
-      const accessToken = await tokenService.getAccessToken(payload);
-      const refreshToken = await tokenService.getRefreshToken(payload);
-      if (updatedPayment && accessToken && refreshToken) {
-        return res.status(200).json({ success: true,adminInfo: adminInfo, accessToken, refreshToken, message: 'Payment successfully validated.' });
-      }
-      if (!updatedPayment) {
-        return res.status(400).json({ success: false, message: 'Failed to update payment status !' });
-      }
-      return res.status(400).json({ success: false, message: 'Payment validation failed !' });
+
+    const updatedPayment = await Payment.findOneAndUpdate(
+      { orderId },
+      { status: 'success' },
+      { new: true }
+    );
+
+    if (!updatedPayment) {
+      return res.status(400).json({ errorMsg: 'Failed to update payment status !' });
     }
+    sendEmail(email);
+    const payload = { id, email };
+    const accessToken = await tokenService.getAccessToken(payload);
+    const refreshToken = await tokenService.getRefreshToken(payload);
+
+    return res.status(200).json({ success: true, adminInfo, accessToken, refreshToken, successMsg: 'Payment successfully validated.' });
   } catch (error) {
-    return res.status(500).json({ success: false, message: 'Error validating payment !' });
+    return res.status(500).json({ errorMsg: 'Error validating payment!' });
+  }
+
+}
+async function sendEmail(email) {
+  const mailOptions = {
+    from: { name: 'Schooliya', address: 'dhakaddeepak9340700360@gmail.com' },
+    to: email,
+    subject: 'Schooliya Account Confirmation: Payment Received',
+    html: `<div style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+      <p style="color: #666;">Hello ${email}</p>
+      <p style="color: #666;">Your payment is confirmed, and your account is now active with Schooliya! Dive right in and explore. For any assistance, reach out to us at support@schooliya.com .</p>
+    </div>`
+  };
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    res.status(500).json({ errorMsg: 'Error sending email !' });
   }
 }
 module.exports = {

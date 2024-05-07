@@ -1,7 +1,7 @@
 <app-header></app-header>
 <div style="background:rgb(243, 241, 250);padding-top: 10vh;">
     <!-- rgb(233, 233, 239) -->
-    <div class="container-fluid" style="padding-bottom: 20vh;">
+    <div class="container-fluid" style="padding-bottom: 20vh;" *ngIf="!paymentCompleted">
         <div class="row">
             <div class="col-lg-10 offset-lg-1" *ngIf="!successMsg">
                 <div class="row">
@@ -410,7 +410,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-12">
-                                            <button type="submit" mat-raised-button class="submit-button" (click)="createPayment()"
+                                            <button type="submit" mat-raised-button class="submit-button" [disabled]="paymentCompleted" (click)="createPayment()"
                                                 style="width: 100% !important;font-size: 16px;"
                                                 >Submit
                                                 Secure

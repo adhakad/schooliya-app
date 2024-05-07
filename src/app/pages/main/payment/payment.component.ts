@@ -16,13 +16,13 @@ import { PlansService } from 'src/app/services/plans.service';
   styleUrls: ['./payment.component.css']
 })
 export class PaymentComponent implements OnInit {
-
+  signupForm: FormGroup;
+  otpForm: FormGroup;
   loader: Boolean = true;
   successMsg: String = '';
   errorMsg: string = '';
   check: boolean = false;
-  signupForm: FormGroup;
-  otpForm: FormGroup;
+  paymentCompleted:Boolean=false;
   classInfo: any;
   adminInfo: any;
   getOTP: Boolean = true;
@@ -72,9 +72,7 @@ export class PaymentComponent implements OnInit {
     const script = this.renderer.createElement('script');
     script.type = 'text/javascript';
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-
     script.onload = () => {
-      // Razorpay script loaded callback
     };
     this.renderer.appendChild(this.el.nativeElement, script);
   }
@@ -89,29 +87,29 @@ export class PaymentComponent implements OnInit {
     })
   }
   signup() {
-    if (this.signupForm.valid) {
-      this.adminAuthService.signup(this.signupForm.value).subscribe((res: any) => {
-        if (res) {
-          this.errorMsg = '';
-          this.email = res.email;
-          this.getOTP = false;
-          this.varifyOTP = true;
-        }
-      }, err => {
-        this.errorMsg = err.error.errorMsg;
-      })
-    }
+    this.adminAuthService.signup(this.signupForm.value).subscribe((res: any) => {
+      if (res) {
+        this.errorMsg = '';
+        this.email = res.email;
+        this.getOTP = false;
+        this.varifyOTP = true;
+      }
+    }, err => {
+      this.errorMsg = err.error.errorMsg;
+    })
   }
 
   submitOtp() {
-    if (this.otpForm.valid) {
-      const otp = this.otpForm.value.digit1 + this.otpForm.value.digit2 + this.otpForm.value.digit3 +
-        this.otpForm.value.digit4 + this.otpForm.value.digit5 + this.otpForm.value.digit6;
-      this.otpForm.value.email = this.email;
-      this.otpForm.value.otp = otp;
+    const otp = this.otpForm.value.digit1 + this.otpForm.value.digit2 + this.otpForm.value.digit3 +
+      this.otpForm.value.digit4 + this.otpForm.value.digit5 + this.otpForm.value.digit6;
+    this.otpForm.value.email = this.email;
+    this.otpForm.value.otp = otp;
+    if (this.otpForm.value.email && this.otpForm.value.otp) {
       this.adminAuthService.varifyOTP(this.otpForm.value).subscribe((res: any) => {
         if (res) {
           this.errorMsg = '';
+          this.getOTP = false;
+          this.varifyOTP = false;
           this.verified = res.verified;
           this.successMsg = res.successMsg;
           this.adminInfo = res.adminInfo;
@@ -121,7 +119,6 @@ export class PaymentComponent implements OnInit {
         this.errorMsg = err.error.errorMsg;
       })
     }
-
   }
 
   createPayment() {
@@ -172,16 +169,17 @@ export class PaymentComponent implements OnInit {
     }
     this.paymentService.validatePayment(paymentData).subscribe((validationResponse: any) => {
       if (validationResponse) {
+        this.paymentCompleted = true;
         this.adminAuthService.deleteAccessRefreshToken();
         this.successMsg = validationResponse.message;
-        this.getOTP = true;
+        this.getOTP = false;
         this.varifyOTP = false;
         this.verified = false;
         this.successMsg = '';
+        this.errorMsg = '';
+        this.adminAuthService.deleteAccessRefreshToken();
         const accessToken = validationResponse.accessToken;
         const refreshToken = validationResponse.refreshToken;
-
-
         this.adminAuthService.storeAccessToken(accessToken);
         this.adminAuthService.storeRefreshToken(refreshToken);
         this.router.navigate(["/admin/dashboard"], { replaceUrl: true });
