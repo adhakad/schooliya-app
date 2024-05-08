@@ -26,8 +26,8 @@
     <button #button mat-button [matMenuTriggerFor]="examMenu">
       <span class="menu-item" style="font-family:'Segoe UI',Verdana">Feature's</span><mat-icon>keyboard_arrow_down</mat-icon>
     </button>
-    <button #button mat-button >
-      <span class="menu-item" style="font-family:'Segoe UI',Verdana">Contact</span>
+    <button #button mat-button style="font-family:'Segoe UI',Verdana" [matMenuTriggerFor]="accountMenu">
+      <span class="menu-item">Account</span><mat-icon>keyboard_arrow_down</mat-icon>
     </button>
     <button (click)="softwareCompany(softwareCompanyLink)" class="submit-button" style="border-radius: 25px;padding-left: 25px;padding-right: 25px;background-color:transparent;color: #8C52FF;border: 1px solid #8C52FF;" mat-button>
       Demo
@@ -46,13 +46,6 @@
     <mat-icon>apartment</mat-icon>
     <span>About School</span>
   </button>
-
-  <button mat-menu-item routerLink="/admin/signup">
-    <mat-icon>emoji_nature</mat-icon>
-    <mat-icon>apartment</mat-icon>
-    <span>Admin Signup</span>
-  </button>
-
 </mat-menu>
 
 <mat-menu #examMenu="matMenu" class="desktop-menu">

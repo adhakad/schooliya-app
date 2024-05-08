@@ -10,12 +10,11 @@
                             You're Online ERP Software Account</h2>
                     </div>
                     <div class="col-lg-7">
-                        <div class="cards"
-                            style="background-color: #fff;height: auto;margin-top: 30px;padding: 40px 30px 40px 30px;box-shadow: rgba(0, 0, 0, 0.05) 0px 3px 8px;border-radius: 5px;">
+                        <div class="cards">
                             <ng-container *ngIf="getOTP && !varifyOTP && !verified">
                                 <form [formGroup]="signupForm" (ngSubmit)="signup()">
                                     <div class="row" style="padding-bottom: 15px;">
-                                        <div class="col-12">
+                                        <div class="col-12 card-detail-title">
                                             <h2>Account Details
                                             </h2>
                                             <mat-divider
@@ -57,7 +56,7 @@
                                             </mat-form-field>
                                         </div>
                                         <div class="row" style="padding-bottom: 30px;">
-                                            <div class="col-12">
+                                            <div class="col-12 card-detail-title">
                                                 <h2>Personal Details
                                                 </h2>
                                                 <mat-divider
@@ -186,12 +185,12 @@
 
                             <ng-container *ngIf="varifyOTP && !getOTP && !verified">
                                 <div class="row" style="padding-bottom: 20px;">
-                                    <div class="col-7 col-lg-4" style="max-width: auto !important;">
-                                        <div class="col-12">
-                                            <h2>Email Varification
+                                    <div class="col-12 " style="max-width: auto !important;">
+                                        <div class="col-12 card-title">
+                                            <h2>Varification
                                             </h2>
-                                            <mat-divider
-                                                style="width: 160px !important;background-color: #804beb;margin-top: -5px;"></mat-divider>
+                                            <p>Enter the code sent to your email</p>
+                                            <p><span>{{adminInfo.email}}</span></p>
                                         </div>
                                     </div>
                                 </div>
@@ -237,12 +236,10 @@
                     <div class="col-lg-5">
                         <div class="row">
                             <div class="col-lg-11 offset-lg-1">
-                                <div class="cards"
-                                    style="background-color: #fff;height: auto;margin-top: 30px;padding: 40px 40px 40px 40px;box-shadow: rgba(0, 0, 0, 0.05) 0px 3px 8px;border-radius: 5px;">
+                                <div class="cards">
                                     <div class="row" style="padding-bottom: 20px;">
-                                        <div class="col-7 col-lg-5" style="text-align: center;">
-                                            <h2>Order Summary <mat-divider
-                                                    style="background-color: #804beb;margin-top: 10px;"></mat-divider>
+                                        <div class="col-12 card-title">
+                                            <h2>Order Summary
                                             </h2>
                                         </div>
                                         <div class="col-12">
@@ -293,42 +290,35 @@
                                                 style="color: rgb(41, 167, 113);font-size:21px;">lock</mat-icon>
                                         </div>
                                         <div class="col-11">
-                                            <h3 style="font-size: 15px;">Razorpay Secure ( UPI, Cards, Wallets,
-                                                NetBanking )</h3>
+                                            <h3 style="font-size: 15px;">Razorpay Secure ( UPI, Cards, Wallets, NetBanking )</h3>
                                         </div>
                                         <div class="col-9">
                                             <div class="row">
 
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/visa.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/visa.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/mastercard.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/mastercard.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/paytm.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/paytm.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/phonepe.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/phonepe.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/google-pay.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/google-pay.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/upi.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/upi.png" alt="">
                                                 </div>
                                             </div>
                                         </div>
 
 
                                         <div class="col-3">
-                                            <p style="margin-top: 8px;">+15 More</p>
+                                            <p style="margin-top: 8px;"> +15</p>
                                         </div>
                                     </div>
 
@@ -369,9 +359,8 @@
                                 <h2 class="title">Proceed to Payment</h2>
                                 <div class="cards-second">
                                     <div class="row" style="padding-bottom: 20px;">
-                                        <div class="col-7 col-lg-5" style="text-align: center;">
-                                            <h2>Order Summary <mat-divider
-                                                    style="background-color: #804beb;margin-top: 10px;"></mat-divider>
+                                        <div class="col-12 card-title">
+                                            <h2>Order Summary
                                             </h2>
                                         </div>
                                         <div class="col-12">
@@ -422,42 +411,35 @@
                                                 style="color: rgb(41, 167, 113);font-size:21px;">lock</mat-icon>
                                         </div>
                                         <div class="col-11">
-                                            <h3 style="font-size: 15px;">Razorpay Secure ( UPI, Cards, Wallets,
-                                                NetBanking )</h3>
+                                            <h3 style="font-size: 15px;">Razorpay Secure ( UPI, Cards, Wallets, NetBanking )</h3>
                                         </div>
                                         <div class="col-9">
                                             <div class="row">
 
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/visa.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/visa.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/mastercard.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/mastercard.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/paytm.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/paytm.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/phonepe.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/phonepe.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/google-pay.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/google-pay.png" alt="">
                                                 </div>
                                                 <div class="col-2">
-                                                    <img src="../../../../assets/payment-icons/upi.png" alt=""
-                                                        style="height: 35px;">
+                                                    <img src="../../../../assets/payment-icons/upi.png" alt="">
                                                 </div>
                                             </div>
                                         </div>
 
 
                                         <div class="col-3">
-                                            <p style="margin-top: 8px;">+15 More</p>
+                                            <p style="margin-top: 8px;"> +15</p>
                                         </div>
                                     </div>
 
