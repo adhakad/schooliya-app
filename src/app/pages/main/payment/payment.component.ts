@@ -27,7 +27,7 @@ export class PaymentComponent implements OnInit {
   adminInfo: any;
   getOTP: Boolean = true;
   varifyOTP: Boolean = false;
-  email: String = '';
+  email: any;
   verified: Boolean = false;
   id: any;
   singlePlanInfo: any;
@@ -100,8 +100,7 @@ export class PaymentComponent implements OnInit {
   }
 
   submitOtp() {
-    const otp = this.otpForm.value.digit1 + this.otpForm.value.digit2 + this.otpForm.value.digit3 +
-      this.otpForm.value.digit4 + this.otpForm.value.digit5 + this.otpForm.value.digit6;
+    const otp = `${this.otpForm.value.digit1}${this.otpForm.value.digit2}${this.otpForm.value.digit3}${this.otpForm.value.digit4}${this.otpForm.value.digit5}${this.otpForm.value.digit6}`;
     this.otpForm.value.email = this.email;
     this.otpForm.value.otp = otp;
     if (this.otpForm.value.email && this.otpForm.value.otp) {
