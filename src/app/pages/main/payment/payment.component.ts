@@ -1,8 +1,6 @@
 import { Component, ElementRef, ViewChild, OnInit, Renderer2, Directive, HostListener, AfterViewInit } from '@angular/core';
 declare var Razorpay: any;
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { forkJoin, of } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
 
 import { ActivatedRoute } from '@angular/router';
 import { Router } from '@angular/router';

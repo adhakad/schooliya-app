@@ -102,6 +102,31 @@ let SignupAdmin = async (req, res, next) => {
 
 }
 
+let ForgotPassword = async (req, res, next) => {
+    const secret = speakeasy.generateSecret({ length: 20 });
+    try {
+        const { email } = req.body;
+        const admin = await AdminUserModel.findOne({ email: email });
+        if (!admin) {
+            return res.status(404).json({ errorMsg: 'Email address not found !' });
+        }
+        const verified = admin.verified;
+        if(verified==false){
+            return res.status(400).json({ errorMsg: 'Acoount is not verified, please verify your email address!' });
+        }
+            const createdOTP = await OTPModel.create({ email, secret: secret.base32 });
+            const token = speakeasy.totp({
+                secret: createdOTP.secret,
+                encoding: 'base32'
+            });
+            sendEmail(email, token);
+            return res.status(200).json({ successMsg: 'Forgot password otp send successfully.', email:email });
+        
+    } catch (error) {
+        return res.status(500).json({ errorMsg: 'Internal Server Error !' });
+    }
+}
+
 async function sendEmail(email, token) {
     const mailOptions = {
         from: { name: 'Schooliya', address: 'dhakaddeepak9340700360@gmail.com' },
@@ -115,12 +140,12 @@ async function sendEmail(email, token) {
     try {
         await transporter.sendMail(mailOptions);
     } catch (error) {
-        res.status(500).json({errorMsg: 'Error sending email !' });
+        res.status(500).json({ errorMsg: 'Error sending email !' });
     }
 }
 
 let VerifyOTP = async (req, res, next) => {
-    
+
     try {
         const email = req.body.email;
         const userEnteredOTP = parseInt(req.body.otp);
@@ -155,64 +180,58 @@ let VerifyOTP = async (req, res, next) => {
     }
 }
 
-let VarifyForgotAdmin = async (req, res, next) => {
-    const { productKey } = req.body;
-    const varifiedAdminInfo = {
-        productKey: productKey
-    }
-    try {
-        let countAdmin = await AdminUserModel.count();
-        if (countAdmin === 1) {
-            let checkAdmin = await AdminUserModel.findOne({ status: 'Active' });
-            if (!checkAdmin) {
-                return res.status(404).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
-            }
-            const checkProductKey = await SchoolKeyModel.findOne({ status: 'Active' });
-            if (!checkProductKey) {
-                return res.status(400).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
-            }
-            const isProductKey = checkProductKey.productKey;
-            const productKeyMatch = await bcrypt.compare(productKey, isProductKey);
-            if (!productKeyMatch) {
-                return res.status(404).json({ errorMsg: 'Product key is invalid !' });
-            }
-            if (productKeyMatch) {
-                return res.status(200).json({ varifiedAdminInfo: varifiedAdminInfo });
-            }
-        }
-        return res.status(404).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
-    } catch (error) {
-        return res.status(500).json('Internal Server Error !');
-    }
-}
+// let VarifyForgotAdmin = async (req, res, next) => {
+//     const { productKey } = req.body;
+//     const varifiedAdminInfo = {
+//         productKey: productKey
+//     }
+//     try {
+//         let countAdmin = await AdminUserModel.count();
+//         if (countAdmin === 1) {
+//             let checkAdmin = await AdminUserModel.findOne({ status: 'Active' });
+//             if (!checkAdmin) {
+//                 return res.status(404).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
+//             }
+//             const checkProductKey = await SchoolKeyModel.findOne({ status: 'Active' });
+//             if (!checkProductKey) {
+//                 return res.status(400).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
+//             }
+//             const isProductKey = checkProductKey.productKey;
+//             const productKeyMatch = await bcrypt.compare(productKey, isProductKey);
+//             if (!productKeyMatch) {
+//                 return res.status(404).json({ errorMsg: 'Product key is invalid !' });
+//             }
+//             if (productKeyMatch) {
+//                 return res.status(200).json({ varifiedAdminInfo: varifiedAdminInfo });
+//             }
+//         }
+//         return res.status(404).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
+//     } catch (error) {
+//         return res.status(500).json('Internal Server Error !');
+//     }
+// }
 
-let ResetForgotAdmin = async (req, res, next) => {
-    const { productKey, email, password } = req.body;
+let ResetPassword = async (req, res, next) => {
+    const { email, password } = req.body;
     try {
-        let checkAdmin = await AdminUserModel.findOne({ status: 'Active' });
-        if (!checkAdmin) {
-            return res.status(404).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
-        }
-        const checkProductKey = await SchoolKeyModel.findOne({ status: 'Active' });
-        if (!checkProductKey) {
-            return res.status(400).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
-        }
-        const isProductKey = checkProductKey.productKey;
-        const productKeyMatch = await bcrypt.compare(productKey, isProductKey);
-        if (!productKeyMatch) {
-            return res.status(404).json({ errorMsg: 'Product key is invalid !' });
+        // let checkAdmin = await AdminUserModel.findOne({ status: 'Active' });
+        // if (!checkAdmin) {
+        //     return res.status(404).json({ errorMsg: "Application access permissions denied, please contact app development company !" });
+        // }
+        const user = await AdminUserModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ errorMsg: "Email does not exist!" });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const resetAdminUserInfo = {
-            email: email,
             password: hashedPassword,
-            status: 'Active',
+            // status: 'Active',
 
         }
-        const objectId = checkAdmin._id;
+        const objectId = user._id;
         const updateAdminUser = await AdminUserModel.findByIdAndUpdate(objectId, { $set: resetAdminUserInfo }, { new: true });
         if (updateAdminUser) {
-            return res.status(200).json({ successMsg: 'Username and password reset successfully.' });
+            return res.status(200).json({ successMsg: 'Reset password successfully.' });
         }
     } catch (error) {
         return res.status(500).json({ errorMsg: 'Internal Server Error !' });
@@ -223,7 +242,7 @@ module.exports = {
     LoginAdmin,
     RefreshToken,
     SignupAdmin,
-    VarifyForgotAdmin,
-    ResetForgotAdmin,
+    ForgotPassword,
+    ResetPassword,
     VerifyOTP,
 }

@@ -41,6 +41,10 @@ export class AdminAuthService {
     return this.http.post(`${this.url}/signup`, adminSignupData);
   }
 
+  forgotPassword(adminForgotData: any) {
+    return this.http.post(`${this.url}/forgot-password`, adminForgotData);
+  }
+
   varifyOTP(adminOtpData: any) {
     return this.http.post(`${this.url}/varify-otp`, adminOtpData);
   }
@@ -48,8 +52,8 @@ export class AdminAuthService {
   adminVarify(adminLoginData: any) {
     return this.http.post(`${this.url}/varify-admin`, adminLoginData);
   }
-  usernamePasswordReset(adminLoginData: AdminLoginData) {
-    return this.http.post(`${this.url}/reset-username-password`, adminLoginData);
+  passwordReset(adminLoginData: any) {
+    return this.http.post(`${this.url}/reset-password`, adminLoginData);
   }
 
   storeAccessToken(accessToken: string) {
