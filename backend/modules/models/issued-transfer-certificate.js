@@ -2,6 +2,11 @@
 const mongoose = require('mongoose');
 
 const IssuedTransferCertificateModel = mongoose.model('issued-transfer-certificate', {
+    adminId: {
+        type: String,
+        required: true,
+        trim: true
+      },
     serialNo: {
         type: Number,
         required: true,

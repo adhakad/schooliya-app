@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const AdmitCardSchema = new Schema({
+  adminId: {
+    type: String,
+    required: true,
+    trim: true
+  },
   studentId: {
     type: String,
     required: true,

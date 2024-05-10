@@ -2,6 +2,11 @@
 const mongoose = require('mongoose');
 
 const schoolSchema = new mongoose.Schema({
+  adminId: {
+    type: String,
+    required: true,
+    trim: true
+  },
   schoolName: {
     type: String,
     required: true,

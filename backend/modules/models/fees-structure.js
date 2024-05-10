@@ -1,6 +1,11 @@
 'use strict';
 const mongoose = require('mongoose');
 const FeesModel = mongoose.model('fees-structure', {
+  adminId: {
+    type: String,
+    required: true,
+    trim: true
+  },
   class: {
     type: Number,
     required: true,

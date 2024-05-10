@@ -1,6 +1,11 @@
 'use strict';
 const mongoose = require('mongoose');
 const ExamResultStructureModel = mongoose.model('exam-result-structure', {
+  adminId: {
+    type: String,
+    required: true,
+    trim: true
+  },
   class: {
     type: Number,
     required: true,

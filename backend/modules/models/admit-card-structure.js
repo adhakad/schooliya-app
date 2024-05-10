@@ -1,6 +1,11 @@
 'use strict';
 const mongoose = require('mongoose');
 const AdmitCardStructureModel = mongoose.model('admit-card-structure', {
+  adminId: {
+    type: String,
+    required: true,
+    trim: true
+  },
   class: {
     type: Number,
     required: true,

@@ -2,6 +2,11 @@
 const mongoose = require('mongoose');
 
 const StudentModel = mongoose.model('student', {
+    adminId: {
+        type: String,
+        required: true,
+        trim: true
+      },
     session: {
         type: String,
         required: true,
