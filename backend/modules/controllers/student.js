@@ -581,6 +581,7 @@ let StudentClassPromote = async (req, res, next) => {
                 receipt: installment,
                 installment: installment,
                 paymentDate: installment,
+                createdBy:installment,
             };
             let createStudentFeesData = await FeesCollectionModel.create(studentFeesData);
             if (createStudentFeesData) {

@@ -103,7 +103,7 @@ export class AdminStudentFeesStatementComponent implements OnInit {
       const installment = Object.keys(this.studentFeesCollection.installment[i])[0];
       const paidAmount:any = Object.values(this.studentFeesCollection.installment[i])[0];
       const paymentDate = Object.values(this.studentFeesCollection.paymentDate[i])[0];
-      const createdBy = this.studentFeesCollection.createdBy[i][0]; 
+      const createdBy =  Object.values(this.studentFeesCollection.createdBy[i])[0];
       allPaidAmount += paidAmount;
       this.processedData.push({
         allPaidAmount,
@@ -117,6 +117,7 @@ export class AdminStudentFeesStatementComponent implements OnInit {
     setTimeout(()=>{
       this.loader = false;
     },1000);
+    console.log(this.processedData)
   }
 
 }

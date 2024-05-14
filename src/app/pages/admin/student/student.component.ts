@@ -120,6 +120,7 @@ export class StudentComponent implements OnInit {
       admissionNo: ['', Validators.required],
       rollNumber: ['', Validators.required],
       stream: ['', Validators.required],
+      createdBy:['']
     })
 
     this.tcForm = this.fb.group({
@@ -599,6 +600,7 @@ export class StudentComponent implements OnInit {
     if (this.studentClassPromoteForm.valid) {
       this.studentClassPromoteForm.value.adminId = this.adminId;
       this.studentClassPromoteForm.value.class = parseInt(this.className);
+      this.studentForm.value.createdBy = 'Admin';
       this.studentService.studentClassPromote(this.studentClassPromoteForm.value).subscribe((res: any) => {
         if (res) {
           setTimeout(() => {
