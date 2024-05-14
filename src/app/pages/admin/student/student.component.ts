@@ -11,6 +11,7 @@ import { ExcelService } from 'src/app/services/excel/excel.service';
 import { SchoolService } from 'src/app/services/school.service';
 import { HttpClient } from '@angular/common/http';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { ClassSubjectService } from 'src/app/services/class-subject.service';
 import { IssuedTransferCertificateService } from 'src/app/services/issued-transfer-certificate.service';
 
@@ -70,9 +71,11 @@ export class StudentComponent implements OnInit {
   isDate: string = '';
   readyTC: Boolean = false;
   baseURL!: string;
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private printPdfService: PrintPdfService, private schoolService: SchoolService, public ete: ExcelService, private issuedTransferCertificate: IssuedTransferCertificateService, private classService: ClassService, private classSubjectService: ClassSubjectService, private studentService: StudentService) {
+  adminId!:String
+  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private printPdfService: PrintPdfService, private schoolService: SchoolService, public ete: ExcelService,private adminAuthService:AdminAuthService, private issuedTransferCertificate: IssuedTransferCertificateService, private classService: ClassService, private classSubjectService: ClassSubjectService, private studentService: StudentService) {
     this.studentForm = this.fb.group({
       _id: [''],
+      adminId:[''],
       session: ['', Validators.required],
       admissionNo: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
       admissionType: ['', Validators.required],
@@ -111,6 +114,7 @@ export class StudentComponent implements OnInit {
 
     this.studentClassPromoteForm = this.fb.group({
       _id: ['', Validators.required],
+      adminId:[''],
       class: [''],
       session: ['', Validators.required],
       admissionNo: ['', Validators.required],
@@ -129,6 +133,8 @@ export class StudentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.className = this.activatedRoute.snapshot.paramMap.get('id');
     if (this.className) {
       let load: any = this.getStudents({ page: 1 });
@@ -258,7 +264,8 @@ export class StudentComponent implements OnInit {
     }
     let params = {
       cls: student.class,
-      stream: stream
+      stream: stream,
+      adminId:this.adminId,
     }
     this.getSingleClassSubjectByStream(params);
   }
@@ -286,7 +293,6 @@ export class StudentComponent implements OnInit {
     this.classSubjectService.getSingleClassSubjectByStream(params).subscribe((res: any) => {
       if (res) {
         this.classSubject = res.subject;
-        console.log(this.classSubject)
       }
       if (!res) {
         this.classSubject = [];
@@ -302,7 +308,11 @@ export class StudentComponent implements OnInit {
   }
 
   getStudentByClass(cls: any) {
-    this.studentService.getStudentByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.studentService.getStudentByClass(params).subscribe((res: any) => {
       if (res) {
         this.studentInfoByClass = res;
         const classMappings: any = {
@@ -330,6 +340,7 @@ export class StudentComponent implements OnInit {
         filters: {},
         page: $event.page,
         limit: $event.limit ? $event.limit : this.recordLimit,
+        adminId:this.adminId,
         class: this.className
       };
       this.recordLimit = params.limit;
@@ -352,7 +363,7 @@ export class StudentComponent implements OnInit {
 
   studentAddUpdate() {
     if (this.studentForm.valid) {
-      console.log(this.studentForm.value)
+      this.studentForm.value.adminId = this.adminId;
       if (this.updateMode) {
         this.studentService.updateStudent(this.studentForm.value).subscribe((res: any) => {
           if (res) {
@@ -586,6 +597,7 @@ export class StudentComponent implements OnInit {
 
   studentClassPromote() {
     if (this.studentClassPromoteForm.valid) {
+      this.studentClassPromoteForm.value.adminId = this.adminId;
       this.studentClassPromoteForm.value.class = parseInt(this.className);
       this.studentService.studentClassPromote(this.studentClassPromoteForm.value).subscribe((res: any) => {
         if (res) {

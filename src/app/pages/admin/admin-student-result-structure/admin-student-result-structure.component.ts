@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { ClassSubjectService } from 'src/app/services/class-subject.service';
 import { ExamResultStructureService } from 'src/app/services/exam-result-structure.service';
 
@@ -44,7 +45,8 @@ export class AdminStudentResultStructureComponent implements OnInit {
   streamMainSubject: any[] = ['Mathematics(Science)', 'Biology(Science)', 'History(Arts)', 'Sociology(Arts)', 'Political Science(Arts)', 'Accountancy(Commerce)', 'Economics(Commerce)', 'Agriculture', 'Home Science'];
   loader: Boolean = true;
   isChecked!: Boolean;
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private classSubjectService: ClassSubjectService, private examResultStructureService: ExamResultStructureService) {
+  adminId!:string;
+  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute,private adminAuthService: AdminAuthService, private classSubjectService: ClassSubjectService, private examResultStructureService: ExamResultStructureService) {
     this.examResultForm = this.fb.group({
       class: [''],
       examType: ['', Validators.required],
@@ -61,6 +63,8 @@ export class AdminStudentResultStructureComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.cls = this.activatedRoute.snapshot.paramMap.get('id');
     this.getExamResultStructureByClass(this.cls);
   }
@@ -163,7 +167,9 @@ export class AdminStudentResultStructureComponent implements OnInit {
       this.theoryMarks = true;
       let params = {
         cls: this.cls,
-        stream: stream
+        stream: stream,
+        adminId:this.adminId,
+
       }
       if (this.theoryMarks) {
         this.getSingleClassSubjectByStream(params)

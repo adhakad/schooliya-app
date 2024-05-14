@@ -5,7 +5,7 @@ const {GetSingleStudentFeesCollectionById,GetAllStudentFeesCollectionByClass,Cre
 
 
 router.get('/student/:studentId',GetSingleStudentFeesCollectionById);
-router.get('/class/:class',GetAllStudentFeesCollectionByClass);
+router.get('/admin/:id/class/:class',GetAllStudentFeesCollectionByClass);
 
 router.post('/',CreateFeesCollection);
 router.post('/admission-fees',CreateAdmissionFeesCollection);

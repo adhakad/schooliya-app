@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 // import { Subject } from 'src/app/modal/subject.model';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { SubjectService } from 'src/app/services/subject.service';
 
 @Component({
@@ -25,14 +26,18 @@ export class SubjectComponent implements OnInit {
   number: number = 0;
   paginationValues: Subject<any> = new Subject();
   loader:Boolean=true;
-  constructor(private fb: FormBuilder, private subjectService: SubjectService) {
+  adminId!:string;
+  constructor(private fb: FormBuilder,private adminAuthService:AdminAuthService, private subjectService: SubjectService) {
     this.subjectForm = this.fb.group({
       _id: [''],
+      adminId:[''],
       subject: ['', Validators.required],
     })
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     let load:any=this.getSubject({page:1});
     if(load){
       setTimeout(()=>{
@@ -46,7 +51,8 @@ export class SubjectComponent implements OnInit {
       let params:any = {
         filters: {},
         page: $event.page,
-        limit: $event.limit ? $event.limit : this.recordLimit
+        limit: $event.limit ? $event.limit : this.recordLimit,
+        adminId:this.adminId,
       };
       this.recordLimit = params.limit;
       if(this.filters.searchText) {
@@ -97,6 +103,7 @@ export class SubjectComponent implements OnInit {
   }
   subjectAddUpdate() {
     if (this.subjectForm.valid) {
+      this.subjectForm.value.adminId = this.adminId;
       if (this.updateMode) {
         this.subjectService.updateSubject(this.subjectForm.value).subscribe((res: any) => {
           if (res) {

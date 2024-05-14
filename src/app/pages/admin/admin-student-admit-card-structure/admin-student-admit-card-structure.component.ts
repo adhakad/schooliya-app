@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { ClassSubjectService } from 'src/app/services/class-subject.service';
 import { AdmitCardStructureService } from 'src/app/services/admit-card-structure.service';
 
@@ -13,7 +14,7 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
   cls: any;
   admitcardForm: FormGroup;
   showModal: boolean = false;
-  showAdmitCardStructureModal:boolean = false;
+  showAdmitCardStructureModal: boolean = false;
   updateMode: boolean = false;
   deleteMode: boolean = false;
   deleteById: String = '';
@@ -29,8 +30,9 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
   examTypes: any[] = ["quarterly", "half yearly", "final"];
   streamMainSubject: any[] = ['Mathematics(Science)', 'Biology(Science)', 'History(Arts)', 'Sociology(Arts)', 'Political Science(Arts)', 'Accountancy(Commerce)', 'Economics(Commerce)', 'Agriculture', 'Home Science'];
   examTime: any[] = ["8:00 AM", "8:30 AM", "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "01:00 PM", "01:30 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM"];
-  loader:Boolean=true;
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private classSubjectService: ClassSubjectService, private admitCardStructureService: AdmitCardStructureService) {
+  loader: Boolean = true;
+  adminId!: string;
+  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private adminAuthService: AdminAuthService, private classSubjectService: ClassSubjectService, private admitCardStructureService: AdmitCardStructureService) {
     this.admitcardForm = this.fb.group({
       class: [''],
       examType: ['', Validators.required],
@@ -44,6 +46,8 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.cls = this.activatedRoute.snapshot.paramMap.get('id');
     this.getAdmitCardStructureByClass(this.cls);
   }
@@ -69,7 +73,8 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
       this.stream = stream;
       let params = {
         cls: this.cls,
-        stream: stream
+        stream: stream,
+        adminId: this.adminId,
       }
       this.getSingleClassSubjectByStream(params)
     }
@@ -94,9 +99,9 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
     this.admitCardStructureService.admitCardStructureByClass(cls).subscribe((res: any) => {
       if (res) {
         this.examAdmitCard = res;
-        setTimeout(()=>{
+        setTimeout(() => {
           this.loader = false;
-        },1000)
+        }, 1000)
         // let date = new Date();
         // let examDate: any = this.examAdmitCard[0]?.examDate;
 
@@ -156,7 +161,7 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
       }
     })
   }
-  processData(examAdmitCard:any) {
+  processData(examAdmitCard: any) {
     for (let i = 0; i < examAdmitCard.examDate.length; i++) {
       const subject = Object.keys(examAdmitCard.examDate[i])[0];
       const date = Object.values(examAdmitCard.examDate[i])[0];
@@ -174,7 +179,7 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
   addAdmitCardModel() {
     this.showModal = true;
   }
-  openAdmitCardStructureModal(examAdmitCard:any){
+  openAdmitCardStructureModal(examAdmitCard: any) {
     this.showAdmitCardStructureModal = true;
     this.admitCardInfo = examAdmitCard;
     this.processData(examAdmitCard);
@@ -276,17 +281,17 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
 
   }
 
-  onToggleChange(id:any,admitCardPublishStatus:any) {
+  onToggleChange(id: any, admitCardPublishStatus: any) {
     let params = {
-      id:id,
-      admitCardPublishStatus :admitCardPublishStatus
+      id: id,
+      admitCardPublishStatus: admitCardPublishStatus
     }
     this.admitCardStructureService.changeAdmitCardPublishStatus(params)
       .subscribe(
         (response: any) => {
         },
         error => {
-            console.log(error)
+          console.log(error)
         }
       );
   }

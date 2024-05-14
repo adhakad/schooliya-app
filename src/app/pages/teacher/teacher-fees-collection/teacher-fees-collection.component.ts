@@ -222,15 +222,15 @@ export class TeacherFeesCollectionComponent implements OnInit {
   feesAddUpdate() {
     if (this.feesForm.valid) {
       if (this.updateMode) {
-        this.feesService.updateFees(this.feesForm.value).subscribe((res: any) => {
-          if (res) {
-            this.closeModal();
-            this.successMsg = res;
-          }
-        }, err => {
-          this.errorCheck = true;
-          this.errorMsg = err.error;
-        })
+        // this.feesService.updateFees(this.feesForm.value).subscribe((res: any) => {
+        //   if (res) {
+        //     this.closeModal();
+        //     this.successMsg = res;
+        //   }
+        // }, err => {
+        //   this.errorCheck = true;
+        //   this.errorMsg = err.error;
+        // })
       } else {
         this.feesForm.value.class = this.singleStudent.class;
         this.feesForm.value.collectedBy = this.collectedBy;
@@ -275,43 +275,43 @@ export class TeacherFeesCollectionComponent implements OnInit {
 
 
 
-  handleImport($event: any) {
-    this.fileChoose = true;
-    const files = $event.target.files;
-    if (files.length) {
-      const file = files[0];
-      const reader = new FileReader();
-      reader.onload = (event: any) => {
-        const wb = read(event.target.fees);
-        const sheets = wb.SheetNames;
+  // handleImport($event: any) {
+  //   this.fileChoose = true;
+  //   const files = $event.target.files;
+  //   if (files.length) {
+  //     const file = files[0];
+  //     const reader = new FileReader();
+  //     reader.onload = (event: any) => {
+  //       const wb = read(event.target.fees);
+  //       const sheets = wb.SheetNames;
 
-        if (sheets.length) {
-          const rows = utils.sheet_to_json(wb.Sheets[sheets[0]]);
-          this.movies = rows;
-        }
-      }
-      reader.readAsArrayBuffer(file);
-    }
+  //       if (sheets.length) {
+  //         const rows = utils.sheet_to_json(wb.Sheets[sheets[0]]);
+  //         this.movies = rows;
+  //       }
+  //     }
+  //     reader.readAsArrayBuffer(file);
+  //   }
 
-  }
+  // }
 
-  onChange(event: MatRadioChange) {
-    this.selectedValue = event.value;
-  }
-  addBulkFeesModel() {
-    this.showBulkFeesModal = true;
-  }
-  addBulkFees() {
-    this.feesService.addBulkFees(this.movies).subscribe((res: any) => {
-      if (res) {
-        this.successMsg = res;
-      }
-    }, err => {
-      this.errorCheck = true;
-      this.errorMsg = err.error.errMsg;
-      this.existRollnumber = err.error.existRollnumber;
-    })
-  }
+  // onChange(event: MatRadioChange) {
+  //   this.selectedValue = event.value;
+  // }
+  // addBulkFeesModel() {
+  //   this.showBulkFeesModal = true;
+  // }
+  // addBulkFees() {
+  //   this.feesService.addBulkFees(this.movies).subscribe((res: any) => {
+  //     if (res) {
+  //       this.successMsg = res;
+  //     }
+  //   }, err => {
+  //     this.errorCheck = true;
+  //     this.errorMsg = err.error.errMsg;
+  //     this.existRollnumber = err.error.existRollnumber;
+  //   })
+  // }
 
 
 }

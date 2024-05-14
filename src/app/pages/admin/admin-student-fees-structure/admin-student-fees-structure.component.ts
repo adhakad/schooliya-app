@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, FormArray } from '@angular/forms';
 import { FeesStructureService } from 'src/app/services/fees-structure.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { SchoolService } from 'src/app/services/school.service';
 
 @Component({
@@ -38,8 +39,10 @@ export class AdminStudentFeesStructureComponent implements OnInit {
   feePerticulars: any[] = ['Registration', 'Tution', 'Books', 'Uniform', 'Examination','Sports','Library','Transport'];
   schoolInfo: any;
   loader: Boolean = true;
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute,private schoolService: SchoolService, private feesStructureService: FeesStructureService) {
+  adminId!:string;
+  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute,private adminAuthService:AdminAuthService,private schoolService: SchoolService, private feesStructureService: FeesStructureService) {
     this.feesForm = this.fb.group({
+      adminId:[''],
       admissionFees: ['', Validators.required],
       type: this.fb.group({
         feesType: this.fb.array([], [Validators.required]),
@@ -50,6 +53,8 @@ export class AdminStudentFeesStructureComponent implements OnInit {
 
   ngOnInit(): void {
     this.getSchool();
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.cls = this.activatedRoute.snapshot.paramMap.get('id');
     this.getFeesStructureByClass(this.cls);
     setTimeout(() => {
@@ -64,7 +69,11 @@ export class AdminStudentFeesStructureComponent implements OnInit {
     })
   }
   getFeesStructureByClass(cls: any) {
-    this.feesStructureService.feesStructureByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.feesStructureService.feesStructureByClass(params).subscribe((res: any) => {
       if (res) {
         this.clsFeesStructure = res;
         this.particularsAdmissionFees = [{ Admission: res.admissionFees }, ...res.feesType];
@@ -177,6 +186,7 @@ export class AdminStudentFeesStructureComponent implements OnInit {
   }
 
   feesStructureAddUpdate() {
+    this.feesForm.value.adminId = this.adminId;
     this.feesForm.value.class = this.cls;
     this.feesForm.value.totalFees = this.totalFees;
     let feesTypeObj = this.feesForm.value.type.feesType;

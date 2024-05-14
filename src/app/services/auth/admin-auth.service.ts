@@ -17,7 +17,6 @@ export class AdminAuthService {
   private tokenTimer: any;
   payload: any;
   private authStatusListener = new Subject<boolean>();
-
   constructor(private http: HttpClient, private router: Router, private cookieService: CookieService) { }
 
 
@@ -112,7 +111,23 @@ export class AdminAuthService {
     this.authStatusListener.next(false);
     clearTimeout(this.tokenTimer);
     this.deleteAccessToken();
+    this.checkUserCookies();
     this.router.navigate(["/"], { replaceUrl: true });
+  }
+
+  private checkUserCookies() {
+    const accessToken = this.cookieService.get("adminAccessToken");
+    const userDetail = this.cookieService.get("_uD");
+    if (!accessToken && !userDetail) {
+      return;
+    }
+    this.deleteAccessToken();
+    const accessTokenRepeat = this.cookieService.get("adminAccessToken");
+    const userDetailRepeat = this.cookieService.get("_uD");
+    if (!accessTokenRepeat && !userDetailRepeat) {
+      return;
+    }
+    this.deleteAccessToken();
   }
 
   getAccessToken() {
@@ -170,22 +185,22 @@ export class AdminAuthService {
     return payload;
   }
 
-
-
   private deleteAccessToken() {
     this.cookieService.delete("adminAccessToken");
     this.cookieService.delete("_uD");
     this.cookieService.delete("_vN");
   }
 
-  deleteAccessRefreshToken() {
+  deleteAllCookies() {
     this.token = null;
     this.isAdminAuthenticated = false;
     this.authStatusListener.next(false);
+    this.deleteAllCookie();
+  }
+  deleteAllCookie() {
+    this.cookieService.delete("_uD");
     this.cookieService.delete("adminAccessToken");
     this.cookieService.delete("adminRefreshToken");
-    this.cookieService.delete("_uD");
     this.cookieService.delete("_vN");
   }
-
 }

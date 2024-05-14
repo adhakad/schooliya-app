@@ -167,14 +167,14 @@ export class PaymentComponent implements OnInit {
     this.paymentService.validatePayment(paymentData).subscribe((validationResponse: any) => {
       if (validationResponse) {
         this.paymentCompleted = true;
-        this.adminAuthService.deleteAccessRefreshToken();
+        this.adminAuthService.deleteAllCookies();
         this.successMsg = validationResponse.message;
         this.getOTP = false;
         this.varifyOTP = false;
         this.verified = false;
         this.successMsg = '';
         this.errorMsg = '';
-        this.adminAuthService.deleteAccessRefreshToken();
+        this.adminAuthService.deleteAllCookies();
         const accessToken = validationResponse.accessToken;
         const refreshToken = validationResponse.refreshToken;
         this.adminAuthService.storeAccessToken(accessToken);

@@ -13,17 +13,11 @@ export class SubjectService {
   addSubject(subjectData: Subject) {
     return this.http.post(this.url, subjectData);
   }
-  getSubjectList() {
-    return this.http.get<Subject[]>(this.url);
+  getSubjectList(adminId:any) {
+    return this.http.get<Subject[]>(`${this.url}/all-subject/${adminId}`);
   }
   getSubjectCount() {
     return this.http.get(`${this.url}/subject-count`);
-  }
-  getSingleSubject(id: any) {
-    return this.http.get<Subject[]>(`${this.url}/${id}`);
-  }
-  getSingleSubjectBySubject(subject: any) {
-    return this.http.get<any>(`${this.url}/subject/${subject}`);
   }
   subjectPaginationList(subjectData: any) {
     return this.http.post(`${this.url}/subject-pagination`, subjectData);

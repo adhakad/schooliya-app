@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { Class } from 'src/app/modal/class.model';
 // import { Subject } from 'src/app/modal/subject.model';
 import { ClassSubject } from 'src/app/modal/class-subject.model';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { ClassService } from 'src/app/services/class.service';
 import { SubjectService } from 'src/app/services/subject.service';
 import { ClassSubjectService } from 'src/app/services/class-subject.service';
@@ -34,9 +35,11 @@ export class ClassSubjectComponent implements OnInit {
   number: number = 0;
   paginationValues: Subject<any> = new Subject();
   loader: Boolean = true;
-  constructor(private fb: FormBuilder, private classService: ClassService, private subjectService: SubjectService, private classSubjectService: ClassSubjectService) {
+  adminId!:string;
+  constructor(private fb: FormBuilder,private adminAuthService:AdminAuthService, private classService: ClassService, private subjectService: SubjectService, private classSubjectService: ClassSubjectService) {
     this.classSubjectForm = this.fb.group({
       _id: [''],
+      adminId:[''],
       class: ['', Validators.required],
       subject: [''],
       stream: ['', Validators.required],
@@ -44,6 +47,8 @@ export class ClassSubjectComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getClass();
     this.getSubject();
     let load: any = this.getClassSubject({ page: 1 });
@@ -109,7 +114,7 @@ export class ClassSubjectComponent implements OnInit {
     })
   }
   getSubject() {
-    this.subjectService.getSubjectList().subscribe((res: any) => {
+    this.subjectService.getSubjectList(this.adminId).subscribe((res: any) => {
       if (res) {
         this.subjectInfo = res;
       }
@@ -121,7 +126,8 @@ export class ClassSubjectComponent implements OnInit {
       let params: any = {
         filters: {},
         page: $event.page,
-        limit: $event.limit ? $event.limit : this.recordLimit
+        limit: $event.limit ? $event.limit : this.recordLimit,
+        adminId:this.adminId,
       };
       this.recordLimit = params.limit;
       if (this.filters.searchText) {
@@ -141,6 +147,7 @@ export class ClassSubjectComponent implements OnInit {
 
   classSubjectAddUpdate() {
     if (this.classSubjectForm.valid) {
+      this.classSubjectForm.value.adminId = this.adminId;
       if (this.updateMode) {
         this.classSubjectService.updateClassSubject(this.classSubjectForm.value).subscribe((res: any) => {
           if (res) {

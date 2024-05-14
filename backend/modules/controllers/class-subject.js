@@ -7,6 +7,7 @@ let countClassSubject = async (req, res, next) => {
 }
 let GetClassSubjectPagination = async (req, res, next) => {
     let searchText = req.body.filters.searchText;
+    const adminId = req.body.adminId;
     let searchObj = {};
     if (searchText) {
         searchObj = /^(?:\d*\.\d{1,2}|\d+)$/.test(searchText)
@@ -19,7 +20,7 @@ let GetClassSubjectPagination = async (req, res, next) => {
     try {
         let limit = (req.body.limit) ? parseInt(req.body.limit) : 10;
         let page = req.body.page || 1;
-        const classSubjectList = await ClassSubjectModel.find(searchObj).sort({ _id: -1 })
+        const classSubjectList = await ClassSubjectModel.find({adminId:adminId}).find(searchObj).sort({ _id: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
@@ -33,22 +34,23 @@ let GetClassSubjectPagination = async (req, res, next) => {
         return res.status(500).json( 'Internal Server Error !' );;
     }
 }
-let GetAllClassSubject = async (req, res, next) => {
-    try {
-        const classSubjectList = await ClassSubjectModel.find({});
-        return res.status(200).json(classSubjectList);
-    } catch (error) {
-        return res.status(500).json( 'Internal Server Error !' );
-    }
-}
+// let GetAllClassSubject = async (req, res, next) => {
+//     try {
+//         const classSubjectList = await ClassSubjectModel.find({});
+//         return res.status(200).json(classSubjectList);
+//     } catch (error) {
+//         return res.status(500).json( 'Internal Server Error !' );
+//     }
+// }
 let GetSingleClassSubjectByStream = async (req, res, next) => {
+    let adminId = req.params.id;
     let className = parseInt(req.params.class);
     let stream = req.params.stream;
     if(stream==="stream"){
         stream = "N/A"
     }
     try {
-        const classSubjectList = await ClassSubjectModel.findOne({class:className,stream:stream});
+        const classSubjectList = await ClassSubjectModel.findOne({adminId:adminId,class:className,stream:stream});
         if(!classSubjectList){
             return res.status(404).json( 'This class and subject group not found. !' );
         }
@@ -58,27 +60,28 @@ let GetSingleClassSubjectByStream = async (req, res, next) => {
     }
 }
 
-let GetSubjectByClass = async (req, res, next) => {
-    try {
-        const subjectList = await ClassSubjectModel.find({ class: req.params.class });
-        return res.status(200).json(subjectList);
-    } catch (error) {
-        return res.status(500).json( 'Internal Server Error !' );;
-    }
-}
-let GetSingleClassSubject = async (req, res, next) => {
-    try {
-        const singleClassSubject = await ClassSubjectModel.findOne({ _id: req.params.id });
-        return res.status(200).json(singleClassSubject);
-    } catch (error) {
-        return res.status(500).json( 'Internal Server Error !' );;
-    }
-}
+// let GetSubjectByClass = async (req, res, next) => {
+//     try {
+//         const subjectList = await ClassSubjectModel.find({ class: req.params.class });
+//         return res.status(200).json(subjectList);
+//     } catch (error) {
+//         return res.status(500).json( 'Internal Server Error !' );;
+//     }
+// }
+// let GetSingleClassSubject = async (req, res, next) => {
+//     try {
+//         const singleClassSubject = await ClassSubjectModel.findOne({ _id: req.params.id });
+//         return res.status(200).json(singleClassSubject);
+//     } catch (error) {
+//         return res.status(500).json( 'Internal Server Error !' );;
+//     }
+// }
 let CreateClassSubject = async (req, res, next) => {
     let className = req.body.class;
-    let { stream, subject } = req.body;
+    let {adminId, stream, subject } = req.body;
     subject = subject.map(subject => ({ subject }));
     const classSubjectData = {
+        adminId:adminId,
         class: className,
         stream: stream,
         subject: subject,
@@ -87,7 +90,7 @@ let CreateClassSubject = async (req, res, next) => {
         if(subject.length ==0 || subject ==null){
             return res.status(400).json(`Please select subject according to this class !`)
         }
-        let checkClassSubject = await ClassSubjectModel.findOne({ class: className, stream: stream });
+        let checkClassSubject = await ClassSubjectModel.findOne({adminId:adminId, class: className, stream: stream });
         if(checkClassSubject){
             return res.status(400).json(`This class and subject group already exist !`)
         }
@@ -123,10 +126,10 @@ let DeleteClassSubject = async (req, res, next) => {
 module.exports = {
     countClassSubject,
     GetClassSubjectPagination,
-    GetAllClassSubject,
+    // GetAllClassSubject,
     GetSingleClassSubjectByStream,
-    GetSubjectByClass,
-    GetSingleClassSubject,
+    // GetSubjectByClass,
+    // GetSingleClassSubject,
     CreateClassSubject,
     UpdateClassSubject,
     DeleteClassSubject,

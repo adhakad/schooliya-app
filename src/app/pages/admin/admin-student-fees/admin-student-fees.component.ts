@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { read, utils, writeFile } from 'xlsx';
 import { FeesService } from 'src/app/services/fees.service';
 import { MatRadioChange } from '@angular/material/radio';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { FeesStructureService } from 'src/app/services/fees-structure.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { SchoolService } from 'src/app/services/school.service';
@@ -47,13 +48,15 @@ export class AdminStudentFeesComponent implements OnInit {
   receiptInstallment: any = {};
   receiptMode: boolean = false;
   loader:Boolean=true;
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) {
+  adminId!:string;
+  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute,private adminAuthService: AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) {
     this.feesForm = this.fb.group({
+      adminId:[''],
       class: [''],
       studentId: [''],
       feesAmount: [''],
       feesInstallment: [''],
-      collectedBy:[''],
+      createdBy:[''],
     });
   }
 
@@ -61,6 +64,8 @@ export class AdminStudentFeesComponent implements OnInit {
 
   ngOnInit(): void {
     this.getSchool();
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     // this.getFees({ page: 1 });
     this.cls = this.activatedRoute.snapshot.paramMap.get('id');
     this.feesStructureByClass(this.cls);
@@ -81,7 +86,11 @@ export class AdminStudentFeesComponent implements OnInit {
   }
 
   getAllStudentFeesCollectionByClass(cls: any) {
-    this.feesService.getAllStudentFeesCollectionByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.feesService.getAllStudentFeesCollectionByClass(params).subscribe((res: any) => {
       if (res) {
         let studentFeesCollection = res.studentFeesCollection;
         let studentInfo = res.studentInfo;
@@ -100,7 +109,11 @@ export class AdminStudentFeesComponent implements OnInit {
   }
 
   feesStructureByClass(cls: any) {
-    this.feesStructureService.feesStructureByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.feesStructureService.feesStructureByClass(params).subscribe((res: any) => {
       if (res) {
         this.clsFeesStructure = res;
       }
@@ -164,17 +177,17 @@ export class AdminStudentFeesComponent implements OnInit {
     this.feesForm.reset();
 
   }
-  updateFeesModel(fees: any) {
-    this.showModal = true;
-    this.deleteMode = false;
-    this.updateMode = true;
-  }
-  deleteFeesModel(id: String) {
-    this.showModal = true;
-    this.updateMode = false;
-    this.deleteMode = true;
-    this.deleteById = id;
-  }
+  // updateFeesModel(fees: any) {
+  //   this.showModal = true;
+  //   this.deleteMode = false;
+  //   this.updateMode = true;
+  // }
+  // deleteFeesModel(id: String) {
+  //   this.showModal = true;
+  //   this.updateMode = false;
+  //   this.deleteMode = true;
+  //   this.deleteById = id;
+  // }
 
 
   // getFees($event: any) {
@@ -204,19 +217,21 @@ export class AdminStudentFeesComponent implements OnInit {
 
   feesAddUpdate() {
     if (this.feesForm.valid) {
+      this.feesForm.value.adminId = this.adminId;
       if (this.updateMode) {
-        this.feesService.updateFees(this.feesForm.value).subscribe((res: any) => {
-          if (res) {
-            this.closeModal();
-            this.successMsg = res;
-          }
-        }, err => {
-          this.errorCheck = true;
-          this.errorMsg = err.error;
-        })
+        // this.feesService.updateFees(this.feesForm.value).subscribe((res: any) => {
+        //   if (res) {
+        //     this.closeModal();
+        //     this.successMsg = res;
+        //   }
+        // }, err => {
+        //   this.errorCheck = true;
+        //   this.errorMsg = err.error;
+        // })
+        console.log("this block is comment out");
       } else {
         this.feesForm.value.class = this.singleStudent.class;
-        this.feesForm.value.collectedBy = "Admin";
+        this.feesForm.value.createdBy = "Admin";
         this.feesForm.value.studentId = this.singleStudent.studentId;
         this.feesForm.value.feesInstallment = this.paybleInstallment[0][0];
         this.feesForm.value.feesAmount = this.paybleInstallment[0][1];
@@ -257,43 +272,43 @@ export class AdminStudentFeesComponent implements OnInit {
 
 
 
-  handleImport($event: any) {
-    this.fileChoose = true;
-    const files = $event.target.files;
-    if (files.length) {
-      const file = files[0];
-      const reader = new FileReader();
-      reader.onload = (event: any) => {
-        const wb = read(event.target.fees);
-        const sheets = wb.SheetNames;
+  // handleImport($event: any) {
+  //   this.fileChoose = true;
+  //   const files = $event.target.files;
+  //   if (files.length) {
+  //     const file = files[0];
+  //     const reader = new FileReader();
+  //     reader.onload = (event: any) => {
+  //       const wb = read(event.target.fees);
+  //       const sheets = wb.SheetNames;
 
-        if (sheets.length) {
-          const rows = utils.sheet_to_json(wb.Sheets[sheets[0]]);
-          this.movies = rows;
-        }
-      }
-      reader.readAsArrayBuffer(file);
-    }
+  //       if (sheets.length) {
+  //         const rows = utils.sheet_to_json(wb.Sheets[sheets[0]]);
+  //         this.movies = rows;
+  //       }
+  //     }
+  //     reader.readAsArrayBuffer(file);
+  //   }
 
-  }
+  // }
 
-  onChange(event: MatRadioChange) {
-    this.selectedValue = event.value;
-  }
-  addBulkFeesModel() {
-    this.showBulkFeesModal = true;
-  }
-  addBulkFees() {
-    this.feesService.addBulkFees(this.movies).subscribe((res: any) => {
-      if (res) {
-        this.successMsg = res;
-      }
-    }, err => {
-      this.errorCheck = true;
-      this.errorMsg = err.error.errMsg;
-      this.existRollnumber = err.error.existRollnumber;
-    })
-  }
+  // onChange(event: MatRadioChange) {
+  //   this.selectedValue = event.value;
+  // }
+  // addBulkFeesModel() {
+  //   this.showBulkFeesModal = true;
+  // }
+  // addBulkFees() {
+  //   this.feesService.addBulkFees(this.movies).subscribe((res: any) => {
+  //     if (res) {
+  //       this.successMsg = res;
+  //     }
+  //   }, err => {
+  //     this.errorCheck = true;
+  //     this.errorMsg = err.error.errMsg;
+  //     this.existRollnumber = err.error.existRollnumber;
+  //   })
+  // }
 
 
 }

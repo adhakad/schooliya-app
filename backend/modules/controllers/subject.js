@@ -2,12 +2,13 @@
 const fs = require('fs');
 const SubjectModel = require('../models/subject');
 
-let countSubject = async(req,res,next) => {
+let countSubject = async (req, res, next) => {
     let countSubject = await SubjectModel.count();
-    return res.status(200).json({countSubject});
+    return res.status(200).json({ countSubject });
 }
 let GetSubjectPagination = async (req, res, next) => {
     let searchText = req.body.filters.searchText;
+    const adminId = req.body.adminId;
     let searchObj = {};
     if (searchText) {
         searchObj = /^(?:\d*\.\d{1,2}|\d+)$/.test(searchText)
@@ -20,11 +21,11 @@ let GetSubjectPagination = async (req, res, next) => {
     try {
         let limit = (req.body.limit) ? parseInt(req.body.limit) : 10;
         let page = req.body.page || 1;
-        const subjectList = await SubjectModel.find(searchObj).sort({ _id: -1 })
+        const subjectList = await SubjectModel.find({adminId:adminId}).find(searchObj).sort({ _id: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
-        const countSubject = await SubjectModel.count();
+        const countSubject = await SubjectModel.count({adminId:adminId});
 
         let subjectData = { countSubject: 0 };
         subjectData.subjectList = subjectList;
@@ -35,37 +36,24 @@ let GetSubjectPagination = async (req, res, next) => {
     }
 }
 let GetAllSubject = async (req, res, next) => {
+    const adminId = req.params.id;
     try {
-        const subjectList = await SubjectModel.find({})
+        const subjectList = await SubjectModel.find({adminId:adminId});
         return res.status(200).json(subjectList);
     } catch (error) {
         return res.status(500).json('Internal Server Error !');
     }
 }
-let GetSingleSubject = async (req, res, next) => {
-    try {
-        const singleSubject = await SubjectModel.findOne({ _id: req.params.id });
-        return res.status(200).json(singleSubject);
-    } catch (error) {
-        return res.status(500).json('Internal Server Error !');
-    }
-}
-let GetSingleSubjectBySubject = async(req,res,next) => {
-    try {
-        const singleSubject = await SubjectModel.findOne({ subject: req.params.id });
-        return res.status(200).json(singleSubject);
-    } catch (error) {
-        return res.status(500).json('Internal Server Error !');
-    }
-}
+
 let CreateSubject = async (req, res, next) => {
-    const { subject } = req.body;
+    const { adminId, subject } = req.body;
     const subjectData = {
+        adminId: adminId,
         subject: subject,
     }
     try {
-        const checkSubject = await SubjectModel.findOne({ subject: subject });
-        if(checkSubject){
+        const checkSubject = await SubjectModel.findOne({ adminId: adminId, subject: subject });
+        if (checkSubject) {
             return res.status(400).json("subject already exist !")
         }
 
@@ -101,8 +89,6 @@ module.exports = {
     countSubject,
     GetSubjectPagination,
     GetAllSubject,
-    GetSingleSubject,
-    GetSingleSubjectBySubject,
     CreateSubject,
     UpdateSubject,
     DeleteSubject,

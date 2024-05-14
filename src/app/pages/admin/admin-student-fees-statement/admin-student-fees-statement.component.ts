@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FeesStructureService } from 'src/app/services/fees-structure.service';
 import { FeesService } from 'src/app/services/fees.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { SchoolService } from 'src/app/services/school.service';
 
 @Component({
@@ -23,10 +24,13 @@ export class AdminStudentFeesStatementComponent implements OnInit {
   studentInfo: any[] = [];
   schoolInfo: any;
   loader:Boolean=true;
-  constructor(public activatedRoute: ActivatedRoute, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) { }
+  adminId!:string;
+  constructor(public activatedRoute: ActivatedRoute,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) { }
 
   ngOnInit(): void {
     this.getSchool();
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.cls = this.activatedRoute.snapshot.paramMap.get('class');
     this.studentId = this.activatedRoute.snapshot.paramMap.get('id');
     this.singleStudentFeesCollectionById(this.studentId)
@@ -75,7 +79,11 @@ export class AdminStudentFeesStatementComponent implements OnInit {
   }
 
   feesStructureByClass(cls: any) {
-    this.feesStructureService.feesStructureByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.feesStructureService.feesStructureByClass(params).subscribe((res: any) => {
       if (res) {
         if (this.studentFeesCollection.admissionFeesPayable == true) {
           res.feesType = [{ Admission: res.admissionFees }, ...res.feesType];
@@ -95,7 +103,7 @@ export class AdminStudentFeesStatementComponent implements OnInit {
       const installment = Object.keys(this.studentFeesCollection.installment[i])[0];
       const paidAmount:any = Object.values(this.studentFeesCollection.installment[i])[0];
       const paymentDate = Object.values(this.studentFeesCollection.paymentDate[i])[0];
-      const collectedBy = Object.values(this.studentFeesCollection.collectedBy[i])[0];
+      const createdBy = this.studentFeesCollection.createdBy[i][0]; 
       allPaidAmount += paidAmount;
       this.processedData.push({
         allPaidAmount,
@@ -103,7 +111,7 @@ export class AdminStudentFeesStatementComponent implements OnInit {
         installment,
         paidAmount,
         paymentDate,
-        collectedBy
+        createdBy
       });
     }
     setTimeout(()=>{

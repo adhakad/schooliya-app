@@ -5,9 +5,10 @@ const FeesCollectionModel = require('../models/fees-collection');
 const StudentModel = require('../models/student');
 
 let GetSingleClassFeesStructure = async (req, res, next) => {
-    let className = req.params.id;
+    let adminId = req.params.id;
+    let className = req.params.class;
     try {
-        const singleFeesStr = await FeesStructureModel.findOne({ class: className });
+        const singleFeesStr = await FeesStructureModel.findOne({adminId:adminId, class: className });
         if(!singleFeesStr){
             return res.status(404).json('Fee Structure not found !')
         }
@@ -19,7 +20,7 @@ let GetSingleClassFeesStructure = async (req, res, next) => {
 
 let CreateFeesStructure = async (req, res, next) => {
     let className = req.body.class;
-    let { admissionFees, totalFees } = req.body;
+    let {adminId, admissionFees, totalFees } = req.body;
     let feesType = req.body.type.feesType;
     let feesPayType = req.body.type.feesPayType;
     let feesTypeTotal = feesType.reduce((total, obj) => {
@@ -36,7 +37,7 @@ let CreateFeesStructure = async (req, res, next) => {
         if (!checkClassExist) {
             return res.status(404).json('Invalid Class !');
         }
-        const checkFeesStructure = await FeesStructureModel.findOne({ class: className });
+        const checkFeesStructure = await FeesStructureModel.findOne({adminId:adminId, class: className });
         if (checkFeesStructure) {
             return res.status(400).json(`Class ${className} fees structure already exist !`);
         }
@@ -46,8 +47,8 @@ let CreateFeesStructure = async (req, res, next) => {
         if (totalFees !== feesPayTypeTotal) {
             return res.status(400).json(`Class ${className} total fees is not equal to all fees installment total !`);
         }
-
         let feesStructureData = {
+            adminId:adminId,
             class: className,
             admissionFees: admissionFees,
             totalFees: totalFees,
@@ -64,7 +65,7 @@ let CreateFeesStructure = async (req, res, next) => {
             });
             let admissionFees = feesStructure.admissionFees;
             let totalFees = feesStructure.totalFees;
-            let checkStudent = await StudentModel.find({ class: className });
+            let checkStudent = await StudentModel.find({adminId:adminId, class: className });
             if (checkStudent) {
                 let studentFeesData = [];
                 for (let i = 0; i < checkStudent.length; i++) {
@@ -114,8 +115,9 @@ let DeleteFeesStructure = async (req, res, next) => {
         }
 
         const className = feesStructure.class;
+        const adminId = feesStructure.adminId;
         const [deleteFeesRecord, deleteFeesStructure] = await Promise.all([
-            FeesCollectionModel.deleteMany({ class: className }),
+            FeesCollectionModel.deleteMany({adminId:adminId, class: className }),
             FeesStructureModel.findByIdAndRemove(id),
         ]);
         if (deleteFeesRecord.deletedCount > 0 || deleteFeesStructure) {

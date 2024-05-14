@@ -13,13 +13,13 @@ export class FeesStructureService {
   addFeesStructure(feesForm:any) {
     return this.http.post(`${this.url}`,feesForm);
   }
-  feesStructureByClass(cls: any) {
-    return this.http.get(`${this.url}/${cls}`);
+  feesStructureByClass(params: any) {
+    return this.http.get(`${this.url}/admin/${params.adminId}/class/${params.class}`);
   }
 
-  addBulkFees(feesBulkResult:any) {
-    return this.http.post(`${this.url}/bulk-fees`,feesBulkResult);
-  }
+  // addBulkFees(feesBulkResult:any) {
+  //   return this.http.post(`${this.url}/bulk-fees`,feesBulkResult);
+  // }
   // feesPaginationList(feesData:any){
   //   return this.http.post(`${this.url}/fees-pagination`,feesData);
   // }

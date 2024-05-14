@@ -13,19 +13,19 @@ export class ClassSubjectService {
   addClassSubject(classSubjectData:ClassSubject){
     return this.http.post(this.url,classSubjectData);
   }
-  getClassSubjectList() {
-    return this.http.get<ClassSubject[]>(this.url);
-  }
+  // getClassSubjectList() {
+  //   return this.http.get<ClassSubject[]>(this.url);
+  // }
   
   getSingleClassSubjectByStream(params:any) {
-    return this.http.get(`${this.url}/subject/${params.cls}/stream/${params.stream}`);
+    return this.http.get(`${this.url}/admin/${params.adminId}/subject/${params.cls}/stream/${params.stream}`);
   }
   getClassSubjectCount() {
     return this.http.get(`${this.url}/class-subject-count`);
   }
-  getSubjectByClass(cls:any) {
-    return this.http.get<ClassSubject[]>(`${this.url}/subject/${cls}`);
-  }
+  // getSubjectByClass(cls:any) {
+  //   return this.http.get<ClassSubject[]>(`${this.url}/subject/${cls}`);
+  // }
   classSubjectPaginationList(classSubjectData:any){
     return this.http.post(`${this.url}/classSubject-pagination`,classSubjectData);
   }

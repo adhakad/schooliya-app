@@ -112,8 +112,8 @@
                                             </td>
                                             <td>
                                                 <span *ngIf="fee.paymentDate==0">-</span>
-                                                <span *ngIf="fee.paymentDate!==0 && fee.collectedBy!==0">{{ fee.collectedBy }}</span>
-                                                <span *ngIf="fee.paymentDate!==0 && fee.collectedBy==0">Online Payment</span>
+                                                <span *ngIf="fee.paymentDate!==0 && fee.createdBy!==0">{{ fee.createdBy }}</span>
+                                                <span *ngIf="fee.paymentDate!==0 && fee.createdBy==0">Online Payment</span>
                                             </td>
                                         </tr>
                                     </ng-container>
