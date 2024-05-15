@@ -5,6 +5,7 @@ import { StudentService } from 'src/app/services/student.service';
 import { ClassService } from 'src/app/services/class.service';
 import { FeesStructureService } from 'src/app/services/fees-structure.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { SchoolService } from 'src/app/services/school.service';
 
 
@@ -50,9 +51,11 @@ export class AdmissionComponent implements OnInit {
   receiptMode: boolean = false;
   baseURL!: string;
   loader: Boolean = true;
-  constructor(private fb: FormBuilder, private schoolService: SchoolService, private printPdfService: PrintPdfService, private classService: ClassService, private studentService: StudentService, private feesStructureService: FeesStructureService) {
+  adminId!:String
+  constructor(private fb: FormBuilder,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private classService: ClassService, private studentService: StudentService, private feesStructureService: FeesStructureService) {
     this.studentForm = this.fb.group({
       _id: [''],
+      adminId:[''],
       session: ['', Validators.required],
       admissionNo: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
       admissionFees: ['', Validators.required],
@@ -88,6 +91,8 @@ export class AdmissionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getSchool();
     let load: any = this.getStudentsByAdmission({ page: 1 });
     this.getClass();
@@ -164,7 +169,7 @@ export class AdmissionComponent implements OnInit {
   }
 
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }
@@ -195,7 +200,11 @@ export class AdmissionComponent implements OnInit {
     this.stream = event.value;
   }
   feesStructureByClass(cls: any) {
-    this.feesStructureService.feesStructureByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.feesStructureService.feesStructureByClass(params).subscribe((res: any) => {
       if (res) {
         res.feesType = [{ Admission: res.admissionFees }, ...res.feesType];
         this.clsFeesStructure = res;
@@ -300,7 +309,8 @@ export class AdmissionComponent implements OnInit {
       let params: any = {
         filters: {},
         page: $event.page,
-        limit: $event.limit ? $event.limit : this.recordLimit
+        limit: $event.limit ? $event.limit : this.recordLimit,
+        adminId:this.adminId,
       };
       this.recordLimit = params.limit;
       if (this.filters.searchText) {
@@ -320,6 +330,7 @@ export class AdmissionComponent implements OnInit {
 
   studentAddUpdate() {
     if (this.studentForm.valid) {
+      this.studentForm.value.adminId = this.adminId;
       this.studentForm.value.admissionType = 'New';
       this.studentForm.value.createdBy = 'Admin';
       this.studentService.addStudent(this.studentForm.value).subscribe((res: any) => {

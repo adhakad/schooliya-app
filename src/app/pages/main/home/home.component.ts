@@ -8,6 +8,7 @@ import { Ads } from 'src/app/modal/ads.model';
 import { Topper } from 'src/app/modal/topper.model';
 import { Testimonial } from 'src/app/modal/testimonial.model';
 import { environment } from 'src/environments/environment';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { BannerService } from 'src/app/services/banner.service';
 import { AdsService } from 'src/app/services/ads.service';
 import { TopperService } from 'src/app/services/topper.service';
@@ -44,10 +45,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
     // Add more students as needed
   ];
 
-
-  constructor(@Inject(PLATFORM_ID) private platformId: Object, private el: ElementRef, private schoolService: SchoolService, private printPdfService: PrintPdfService, private plansService: PlansService, private bannerService: BannerService, private topperService: TopperService, private testimonialService: TestimonialService, private adsService: AdsService, private studentAuthService: StudentAuthService) { }
+  adminId!:any;
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private el: ElementRef,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private plansService: PlansService, private bannerService: BannerService, private topperService: TopperService, private testimonialService: TestimonialService, private adsService: AdsService, private studentAuthService: StudentAuthService) { }
 
   async ngOnInit() {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getLoggedInStudentInfo();
     this.getPlans();
     this.getBanner();
@@ -165,7 +168,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     })
   }
   getBanner() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

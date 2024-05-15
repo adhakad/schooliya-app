@@ -4,7 +4,7 @@ const router = express.Router();
 const {GetSingleSchoolNameLogo,GetSingleSchool,CreateSchool,UpdateSchool,DeleteSchool} = require('../controllers/school');
 
 router.get('/name-logo',GetSingleSchoolNameLogo);
-router.get('/',GetSingleSchool);
+router.get('/:id',GetSingleSchool);
 router.post('/',CreateSchool);
 router.put('/:id',UpdateSchool);
 router.delete('/:id',DeleteSchool);

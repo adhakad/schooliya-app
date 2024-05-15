@@ -165,7 +165,7 @@ export class StudentComponent implements OnInit {
     })
   }
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }
@@ -316,6 +316,7 @@ export class StudentComponent implements OnInit {
     this.studentService.getStudentByClass(params).subscribe((res: any) => {
       if (res) {
         this.studentInfoByClass = res;
+        console.log(res)
         const classMappings: any = {
           200: "Nursery",
           201: "LKG",
@@ -488,6 +489,7 @@ export class StudentComponent implements OnInit {
     let studentRecordData = {
       bulkStudentRecord: this.bulkStudentRecord,
       class: this.className,
+      adminId:this.adminId,
       createdBy: 'Admin',
 
     }

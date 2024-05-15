@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Student } from '../modal/student.modal';
 import { environment } from 'src/environments/environment';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,7 @@ export class StudentService {
     return this.http.get<Student[]>(this.url);
   }
   getStudentByClass(params:any){
-    return this.http.get(`${this.url}/admin/${params.adminId}/student/${params.adminId}`);
+    return this.http.get(`${this.url}/admin/${params.adminId}/student/${params.class}`);
   }
   getStudentCount() {
     return this.http.get(`${this.url}/student-count`);

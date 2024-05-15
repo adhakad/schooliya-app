@@ -10,6 +10,7 @@ import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { SchoolService } from 'src/app/services/school.service';
 import { TeacherAuthService } from 'src/app/services/auth/teacher-auth.service';
 import { TeacherService } from 'src/app/services/teacher.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Component({
   selector: 'app-teacher-fees-collection',
@@ -52,7 +53,8 @@ export class TeacherFeesCollectionComponent implements OnInit {
   teacherInfo:any;
   collectedBy:String='';
   loader:Boolean=true;
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute,private teacherAuthService:TeacherAuthService,private teacherService:TeacherService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) {
+  adminId!:any;
+  constructor(private adminAuthService:AdminAuthService,private fb: FormBuilder, public activatedRoute: ActivatedRoute,private teacherAuthService:TeacherAuthService,private teacherService:TeacherService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) {
     this.feesForm = this.fb.group({
       class: [''],
       studentId: [''],
@@ -65,6 +67,8 @@ export class TeacherFeesCollectionComponent implements OnInit {
 
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getSchool();
     // this.getFees({ page: 1 });
     this.cls = this.activatedRoute.snapshot.paramMap.get('id');
@@ -90,7 +94,7 @@ export class TeacherFeesCollectionComponent implements OnInit {
   }
 
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +15,8 @@ export class SchoolService {
   addSchool(schoolData: any) {
     return this.http.post(this.url, schoolData);
   }
-  getSchool() {
-    return this.http.get<any>(this.url);
+  getSchool(adminId:any) {
+    return this.http.get<any>(`${this.url}/${adminId}`);
   }
   updateSchool(schoolData: any) {
     return this.http.put(`${this.url}/${schoolData._id}`, schoolData);

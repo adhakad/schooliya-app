@@ -8,6 +8,7 @@ import { StudentService } from 'src/app/services/student.service';
 import { ClassService } from 'src/app/services/class.service';
 import { MatRadioChange } from '@angular/material/radio';
 import { ExcelService } from 'src/app/services/excel/excel.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { SchoolService } from 'src/app/services/school.service';
 import { HttpClient } from '@angular/common/http';
 import { TeacherAuthService } from 'src/app/services/auth/teacher-auth.service';
@@ -61,7 +62,8 @@ export class TeacherStudentComponent implements OnInit {
   loader: Boolean = true;
   promotedClass: any;
   singleStudentInfo: any
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute,private teacherAuthService:TeacherAuthService,private teacherService:TeacherService, private schoolService: SchoolService, public ete: ExcelService, private classService: ClassService, private studentService: StudentService) {
+  adminId!:any;
+  constructor(private adminAuthService:AdminAuthService,private fb: FormBuilder, public activatedRoute: ActivatedRoute,private teacherAuthService:TeacherAuthService,private teacherService:TeacherService, private schoolService: SchoolService, public ete: ExcelService, private classService: ClassService, private studentService: StudentService) {
     this.studentForm = this.fb.group({
       _id: [''],
       session: ['', Validators.required],
@@ -108,6 +110,8 @@ export class TeacherStudentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.className = this.activatedRoute.snapshot.paramMap.get('id');
     this.teacherInfo = this.teacherAuthService.getLoggedInTeacherInfo();
     if(this.teacherInfo){
@@ -134,7 +138,7 @@ export class TeacherStudentComponent implements OnInit {
     })
   }
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

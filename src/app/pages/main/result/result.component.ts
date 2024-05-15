@@ -5,7 +5,7 @@ import { ExamResultService } from 'src/app/services/exam-result.service';
 import { ClassService } from 'src/app/services/class.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { SchoolService } from 'src/app/services/school.service';
-
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Component({
   selector: 'app-result',
@@ -23,8 +23,8 @@ export class ResultComponent implements OnInit {
   resultStructureInfo: any;
   processedData: any[] = [];
   loader: Boolean = false;
-
-  constructor(private fb: FormBuilder, private schoolService: SchoolService, private printPdfService: PrintPdfService, private examResultService: ExamResultService, private classService: ClassService) {
+  adminId!:any;
+  constructor(private fb: FormBuilder,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private examResultService: ExamResultService, private classService: ClassService) {
     this.examResultForm = this.fb.group({
       admissionNo: ['', Validators.required],
       class: ['', Validators.required],
@@ -32,6 +32,8 @@ export class ResultComponent implements OnInit {
     })
   }
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getClass();
     this.getSchool();
   }
@@ -46,7 +48,7 @@ export class ResultComponent implements OnInit {
   }
 
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

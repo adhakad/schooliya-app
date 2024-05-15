@@ -6,6 +6,7 @@ import { FeesService } from 'src/app/services/fees.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { SchoolService } from 'src/app/services/school.service';
 import { TeacherService } from 'src/app/services/teacher.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Component({
   selector: 'app-teacher-student-fee-statement',
@@ -28,9 +29,12 @@ export class TeacherStudentFeeStatementComponent implements OnInit {
   teacherInfo:any;
   collectBy:String='';
   loader:Boolean=true;
-  constructor(public activatedRoute: ActivatedRoute, private schoolService: SchoolService,private teacherAuthService:TeacherAuthService,private teacherService:TeacherService,private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) { }
+  adminId!:any;
+  constructor(private adminAuthService:AdminAuthService,public activatedRoute: ActivatedRoute, private schoolService: SchoolService,private teacherAuthService:TeacherAuthService,private teacherService:TeacherService,private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) { }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getSchool();
     this.teacherInfo = this.teacherAuthService.getLoggedInTeacherInfo();
     if(this.teacherInfo){
@@ -49,7 +53,7 @@ export class TeacherStudentFeeStatementComponent implements OnInit {
     })
   }
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

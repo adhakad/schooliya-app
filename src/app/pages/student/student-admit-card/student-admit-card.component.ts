@@ -3,6 +3,7 @@ import { AdmitCardService } from 'src/app/services/admit-card.service';
 import { StudentAuthService } from 'src/app/services/auth/student-auth.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { SchoolService } from 'src/app/services/school.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Component({
   selector: 'app-student-admit-card',
@@ -18,8 +19,11 @@ export class StudentAdmitCardComponent implements OnInit {
   admitCardInfo: any;
   processedData: any[] = [];
   loader:Boolean=true;
-  constructor(private schoolService:SchoolService,private studentAuthService: StudentAuthService,private printPdfService: PrintPdfService, private admitCardService: AdmitCardService) {}
+  adminId!:any;
+  constructor(private adminAuthService:AdminAuthService,private schoolService:SchoolService,private studentAuthService: StudentAuthService,private printPdfService: PrintPdfService, private admitCardService: AdmitCardService) {}
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getSchool();
     this.studentInfo = this.studentAuthService.getLoggedInStudentInfo();
     let studentId = this.studentInfo?.id;
@@ -34,7 +38,7 @@ export class StudentAdmitCardComponent implements OnInit {
     this.printPdfService.generatePDF(this.content.nativeElement, "Admitcard.pdf");
   }
   getSchool(){
-    this.schoolService.getSchool().subscribe((res:any)=> {
+    this.schoolService.getSchool(this.adminId).subscribe((res:any)=> {
       if(res){
         this.schoolInfo = res;
       }

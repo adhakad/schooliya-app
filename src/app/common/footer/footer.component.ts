@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SchoolService } from 'src/app/services/school.service';
 import { environment } from 'src/environments/environment';
-
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
@@ -16,9 +16,12 @@ export class FooterComponent implements OnInit {
   instagram!:string;
   youtube!:string;
   softwareCompanyLink:string='https://schooliya.in';
-  constructor(private schoolService:SchoolService) { }
+  adminId!:any;
+  constructor(private schoolService:SchoolService,private adminAuthService:AdminAuthService) { }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getSchool();
     this.currentYear = (new Date()).getFullYear();
   }
@@ -31,7 +34,7 @@ export class FooterComponent implements OnInit {
     window.location.href = sanitizedLink;
   }
   getSchool(){
-    this.schoolService.getSchool().subscribe((res:any)=> {
+    this.schoolService.getSchool(this.adminId).subscribe((res:any)=> {
       if(res){
         this.schoolInfo = res;
         this.facebook = res.facebookLink;

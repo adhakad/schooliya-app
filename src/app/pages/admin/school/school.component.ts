@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SchoolService } from 'src/app/services/school.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Component({
   selector: 'app-school',
@@ -19,9 +20,11 @@ export class SchoolComponent implements OnInit {
   errorCheck: Boolean = false;
   schoolInfo: any;
   loader: Boolean = true;
-  constructor(private fb: FormBuilder, private schoolService: SchoolService) {
+  adminId!:String
+  constructor(private fb: FormBuilder, private schoolService: SchoolService,private adminAuthService:AdminAuthService) {
     this.schoolForm = this.fb.group({
       _id: [''],
+      adminId:[''],
       schoolName: ['', [Validators.required, Validators.maxLength(50)]],
       affiliationNumber: ['', [Validators.required, Validators.maxLength(15)]],
       schoolCode: ['', [Validators.required, Validators.maxLength(15)]],
@@ -43,8 +46,9 @@ export class SchoolComponent implements OnInit {
     })
   }
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getSchool();
-
     setTimeout(() => {
       this.loader = false;
     }, 2000)
@@ -83,7 +87,7 @@ export class SchoolComponent implements OnInit {
   }
 
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }
@@ -92,6 +96,7 @@ export class SchoolComponent implements OnInit {
 
   schoolAddUpdate() {
     if (this.schoolForm.valid) {
+      this.schoolForm.value.adminId = this.adminId;
       if (this.updateMode) {
         this.schoolService.updateSchool(this.schoolForm.value).subscribe((res: any) => {
           if (res) {

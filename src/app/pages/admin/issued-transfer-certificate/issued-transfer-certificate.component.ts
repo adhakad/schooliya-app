@@ -5,6 +5,7 @@ import { StudentService } from 'src/app/services/student.service';
 import { ClassService } from 'src/app/services/class.service';
 import { FeesStructureService } from 'src/app/services/fees-structure.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { SchoolService } from 'src/app/services/school.service';
 import { IssuedTransferCertificateService } from 'src/app/services/issued-transfer-certificate.service';
 
@@ -34,9 +35,12 @@ export class IssuedTransferCertificateComponent implements OnInit {
   cls: number = 0;
   schoolInfo: any;
   loader: Boolean = true;
-  constructor( private schoolService: SchoolService, private printPdfService: PrintPdfService,private issuedTransferCertificate: IssuedTransferCertificateService) { }
+  adminId!:any;
+  constructor( private schoolService: SchoolService,private adminAuthService:AdminAuthService, private printPdfService: PrintPdfService,private issuedTransferCertificate: IssuedTransferCertificateService) { }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getSchool();
     let load: any = this.getIssuedTransferCertificate({ page: 1 });
     if (load) {
@@ -46,7 +50,7 @@ export class IssuedTransferCertificateComponent implements OnInit {
     }
   }
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

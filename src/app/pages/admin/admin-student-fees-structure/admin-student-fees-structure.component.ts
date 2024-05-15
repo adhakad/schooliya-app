@@ -62,7 +62,7 @@ export class AdminStudentFeesStructureComponent implements OnInit {
     }, 1000);
   }
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }
@@ -75,9 +75,12 @@ export class AdminStudentFeesStructureComponent implements OnInit {
     }
     this.feesStructureService.feesStructureByClass(params).subscribe((res: any) => {
       if (res) {
+        this.errorMsg='';
         this.clsFeesStructure = res;
         this.particularsAdmissionFees = [{ Admission: res.admissionFees }, ...res.feesType];
       }
+    },err => {
+      this.errorMsg = err.error;
     })
   }
   installmentPayment() {

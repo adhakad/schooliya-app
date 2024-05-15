@@ -13,7 +13,7 @@ let GetSingleSchoolNameLogo = async (req, res, next) => {
 }
 let GetSingleSchool = async (req, res, next) => {
     try {
-        const singleSchool = await SchoolModel.findOne({});
+        const singleSchool = await SchoolModel.findOne({adminId:req.params.id});
         if (singleSchool) {
             return res.status(200).json(singleSchool);
         }
@@ -22,14 +22,14 @@ let GetSingleSchool = async (req, res, next) => {
     }
 }
 let CreateSchool = async (req, res, next) => {
-    let { schoolName, affiliationNumber, schoolCode, foundedYear, board, medium, street, city, district, state, country, pinCode, phoneOne, phoneSecond, email, facebookLink, linkedinLink, instagramLink, youtubeLink } = req.body;
-    const schoolData = { schoolName, affiliationNumber, schoolCode, foundedYear, board, medium, street, city, district, state, country, pinCode, phoneOne, phoneSecond, email, facebookLink, linkedinLink, instagramLink, youtubeLink };
+    let { adminId, schoolName, affiliationNumber, schoolCode, foundedYear, board, medium, street, city, district, state, country, pinCode, phoneOne, phoneSecond, email, facebookLink, linkedinLink, instagramLink, youtubeLink } = req.body;
+    const schoolData = { adminId, schoolName, affiliationNumber, schoolCode, foundedYear, board, medium, street, city, district, state, country, pinCode, phoneOne, phoneSecond, email, facebookLink, linkedinLink, instagramLink, youtubeLink };
     try {
-        let countSchool = await SchoolModel.count();
+        let countSchool = await SchoolModel.count({ adminId: adminId });
         if (countSchool > 0) {
             return res.status(400).json('School detail already exist !');
         }
-        let school = await SchoolModel.findOne({ affiliationNumber: affiliationNumber, schoolCode: schoolCode });
+        let school = await SchoolModel.findOne({ adminId: adminId, affiliationNumber: affiliationNumber, schoolCode: schoolCode });
         if (school) {
             return res.status(400).json('School detail already exist !');
         }

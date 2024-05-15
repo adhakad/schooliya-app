@@ -36,7 +36,7 @@ export class AdminStudentFeesStatementComponent implements OnInit {
     this.singleStudentFeesCollectionById(this.studentId)
   }
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

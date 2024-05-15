@@ -3,6 +3,8 @@ import { StudentAuthService } from 'src/app/services/auth/student-auth.service';
 import { ExamResultService } from 'src/app/services/exam-result.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { SchoolService } from 'src/app/services/school.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
+
 @Component({
   selector: 'app-student-result',
   templateUrl: './student-result.component.html',
@@ -17,8 +19,11 @@ export class StudentResultComponent implements OnInit {
   processedData: any[] = [];
   schoolInfo: any;
   loader: Boolean = true;
-  constructor(private schoolService: SchoolService, private studentAuthService: StudentAuthService, private printPdfService: PrintPdfService, private examResultService: ExamResultService) { }
+  adminId!:any;
+  constructor(private adminAuthService:AdminAuthService,private schoolService: SchoolService, private studentAuthService: StudentAuthService, private printPdfService: PrintPdfService, private examResultService: ExamResultService) { }
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getSchool();
     let studentInfo = this.studentAuthService.getLoggedInStudentInfo();
     let studentId = studentInfo?.id;
@@ -26,7 +31,7 @@ export class StudentResultComponent implements OnInit {
   }
 
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

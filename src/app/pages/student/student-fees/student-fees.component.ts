@@ -7,6 +7,7 @@ import { FeesService } from 'src/app/services/fees.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { PaymentService } from 'src/app/services/payment/payment.service';
 import { SchoolService } from 'src/app/services/school.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Component({
   selector: 'app-student-fees',
@@ -26,9 +27,12 @@ export class StudentFeesComponent implements OnInit {
   student:any;
   schoolInfo:any;
   loader:Boolean=true;
-  constructor(private renderer: Renderer2, private el: ElementRef,private schoolService:SchoolService, private paymentService: PaymentService, private studentAuthService: StudentAuthService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) { }
+  adminId!:any;
+  constructor(private adminAuthService:AdminAuthService,private renderer: Renderer2, private el: ElementRef,private schoolService:SchoolService, private paymentService: PaymentService, private studentAuthService: StudentAuthService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) { }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     const script = this.renderer.createElement('script');
     script.type = 'text/javascript';
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
@@ -45,7 +49,7 @@ export class StudentFeesComponent implements OnInit {
     this.feesStructureByClass(this.cls);
   }
   getSchool(){
-    this.schoolService.getSchool().subscribe((res:any)=>{
+    this.schoolService.getSchool(this.adminId).subscribe((res:any)=>{
       if(res){
         this.schoolInfo = res;
       }

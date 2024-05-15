@@ -61,6 +61,9 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <ng-container *ngIf="!clsFeesStructure">
+                                    <h2 style="text-align: center;margin-top: 150px;">No Record Found</h2>
+                                </ng-container>
                             </div>
 
                             <div class="modal fade show" [class.show]="showModal">

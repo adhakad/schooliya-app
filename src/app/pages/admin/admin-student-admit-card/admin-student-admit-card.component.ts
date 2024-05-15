@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AdmitCardStructureService } from 'src/app/services/admit-card-structure.service';
 import { AdmitCardService } from 'src/app/services/admit-card.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { SchoolService } from 'src/app/services/school.service';
 
 @Component({
@@ -27,11 +28,14 @@ export class AdminStudentAdmitCardComponent implements OnInit {
   selectedStream: string = '';
   streamSection: boolean = true;
   streamMainSubject: any[] = [];
-  constructor(public activatedRoute: ActivatedRoute, private schoolService: SchoolService, private admitCardService: AdmitCardService, private printPdfService: PrintPdfService, private admitCardStructureService: AdmitCardStructureService) {
+  adminId!:string;
+  constructor(public activatedRoute: ActivatedRoute,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private admitCardService: AdmitCardService, private printPdfService: PrintPdfService, private admitCardStructureService: AdmitCardStructureService) {
 
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.cls = this.activatedRoute.snapshot.paramMap.get('id');
     this.getStudentAdmitCardByClass(this.cls);
     this.getAdmitCardStructureByClass(this.cls);
@@ -70,7 +74,7 @@ export class AdminStudentAdmitCardComponent implements OnInit {
     })
   }
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

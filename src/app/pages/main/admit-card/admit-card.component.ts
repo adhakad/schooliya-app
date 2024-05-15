@@ -5,7 +5,7 @@ import { AdmitCardService } from 'src/app/services/admit-card.service';
 import { ClassService } from 'src/app/services/class.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { SchoolService } from 'src/app/services/school.service';
-
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Component({
   selector: 'app-admit-card',
@@ -22,7 +22,8 @@ export class AdmitCardComponent implements OnInit {
   admitCardInfo: any;
   processedData: any[] = [];
   loader: Boolean = false;
-  constructor(private fb: FormBuilder, private schoolService: SchoolService, private printPdfService: PrintPdfService, private admitCardService: AdmitCardService, private classService: ClassService) {
+  adminId!:any;
+  constructor(private fb: FormBuilder,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private admitCardService: AdmitCardService, private classService: ClassService) {
     this.admitCardForm = this.fb.group({
       admissionNo: ['', Validators.required],
       class: ['', Validators.required],
@@ -30,6 +31,8 @@ export class AdmitCardComponent implements OnInit {
     })
   }
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getClass();
     this.getSchool();
   }
@@ -42,7 +45,7 @@ export class AdmitCardComponent implements OnInit {
     this.printPdfService.generatePDF(this.content.nativeElement, "Admitcard.pdf");
   }
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }

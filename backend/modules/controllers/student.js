@@ -18,6 +18,7 @@ let countStudent = async (req, res, next) => {
 let GetStudentPaginationByAdmission = async (req, res, next) => {
     let searchText = req.body.filters.searchText;
     let className = req.body.class;
+    let adminId = req.body.adminId;
     let searchObj = {};
     if (searchText) {
         searchObj = /^(?:\d*\.\d{1,2}|\d+)$/.test(searchText) ? { $or: [{ class: searchText }, { rollNumber: searchText }, { admissionNo: searchText }] } : { name: new RegExp(`${searchText.toString().trim()}`, 'i') }
@@ -25,11 +26,11 @@ let GetStudentPaginationByAdmission = async (req, res, next) => {
     try {
         let limit = (req.body.limit) ? parseInt(req.body.limit) : 10;
         let page = req.body.page || 1;
-        const studentList = await StudentModel.find({ admissionType: 'New' }).find(searchObj).sort({ _id: -1 })
+        const studentList = await StudentModel.find({adminId:adminId, admissionType: 'New' }).find(searchObj).sort({ _id: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
-        const countStudent = await StudentModel.count({ admissionType: 'New' });
+        const countStudent = await StudentModel.count({adminId:adminId, admissionType: 'New' });
         let studentData = { countStudent: 0 };
         studentData.studentList = studentList;
         studentData.countStudent = countStudent;
@@ -129,7 +130,7 @@ let GetStudentPaginationByClass = async (req, res, next) => {
 
 let GetAllStudentByClass = async (req, res, next) => {
     try {
-        let singleStudent = await StudentModel.find({ adminId: req.params.adminId, class: req.params.class }, '-otp -status -__v').sort({ _id: -1 });
+        let singleStudent = await StudentModel.find({ adminId : req.params.id, class: req.params.class }, '-otp -status -__v').sort({ _id: -1 });
         return res.status(200).json(singleStudent);
     } catch (error) {
         return res.status(500).json('Internal Server Error !');
@@ -319,6 +320,7 @@ let CreateStudentAdmissionEnquiry = async (req, res, next) => {
 let CreateBulkStudentRecord = async (req, res, next) => {
     let bulkStudentRecord = req.body.bulkStudentRecord;
     let className = req.body.class;
+    let adminId = req.body.adminId;
     let createdBy = req.body.createdBy;
     className = parseInt(className);
     const classMappings = {
@@ -346,6 +348,7 @@ let CreateBulkStudentRecord = async (req, res, next) => {
     for (const student of bulkStudentRecord) {
         let otp = Math.floor(Math.random() * 899999 + 100000);
         studentData.push({
+            adminId:adminId,
             name: student.name,
             rollNumber: student.rollNumber,
             aadharNumber: student.aadharNumber,
@@ -432,7 +435,7 @@ let CreateBulkStudentRecord = async (req, res, next) => {
             return res.status(400).json(`Admission number(s) ${spreadAdmissionNo} already exist !`);
         }
 
-        const existingRecords = await StudentModel.find({ class: className }).lean();
+        const existingRecords = await StudentModel.find({adminId:adminId, class: className }).lean();
         const duplicateRollNumber = [];
         for (const student of studentData) {
             // Check duplicate students exist from dadabase
@@ -446,7 +449,7 @@ let CreateBulkStudentRecord = async (req, res, next) => {
             const spreadRollNumber = duplicateRollNumber.join(', ');
             return res.status(400).json(`Roll number(s) ${spreadRollNumber} already exist for this class !`);
         }
-        const checkFeesStr = await FeesStructureModel.findOne({ class: className });
+        const checkFeesStr = await FeesStructureModel.findOne({adminId:adminId, class: className });
         if (!checkFeesStr) {
             return res.status(404).json(`Please create fees structure for class ${className} !`);
         }
@@ -466,6 +469,7 @@ let CreateBulkStudentRecord = async (req, res, next) => {
         for (let i = 0; i < createStudent.length; i++) {
             let student = createStudent[i];
             let feesObject = {
+                adminId:adminId,
                 studentId: student._id,
                 class: student.class,
                 admissionFeesPayable: false,

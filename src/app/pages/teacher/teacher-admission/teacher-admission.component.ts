@@ -9,6 +9,7 @@ import { SchoolService } from 'src/app/services/school.service';
 import { ActivatedRoute } from '@angular/router';
 import { TeacherAuthService } from 'src/app/services/auth/teacher-auth.service';
 import { TeacherService } from 'src/app/services/teacher.service';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 
 @Component({
   selector: 'app-teacher-admission',
@@ -53,7 +54,8 @@ export class TeacherAdmissionComponent implements OnInit {
   createdBy:String='';
   receiptMode: boolean = false;
   loader:Boolean=true;
-  constructor(private fb: FormBuilder,private activatedRoute:ActivatedRoute,private teacherAuthService:TeacherAuthService,private teacherService:TeacherService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private classService: ClassService, private studentService: StudentService, private feesStructureService: FeesStructureService) {
+  adminId!:any;
+  constructor(private adminAuthService:AdminAuthService,private fb: FormBuilder,private activatedRoute:ActivatedRoute,private teacherAuthService:TeacherAuthService,private teacherService:TeacherService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private classService: ClassService, private studentService: StudentService, private feesStructureService: FeesStructureService) {
     this.studentForm = this.fb.group({
       _id: [''],
       session: ['', Validators.required],
@@ -91,6 +93,8 @@ export class TeacherAdmissionComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.getSchool();
     this.teacherInfo = this.teacherAuthService.getLoggedInTeacherInfo();
     if(this.teacherInfo){
@@ -119,7 +123,7 @@ export class TeacherAdmissionComponent implements OnInit {
     this.closeModal();
   }
   getSchool() {
-    this.schoolService.getSchool().subscribe((res: any) => {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }
