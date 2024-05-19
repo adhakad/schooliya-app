@@ -1,11 +1,11 @@
 'use strict';
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const speakeasy = require('speakeasy');
 const tokenService = require('../../services/admin-token');
 const AdminUserModel = require('../../models/users/admin-user');
 const OTPModel = require('../../models/otp');
-const SchoolKeyModel = require('../../models/users/school-key');
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -17,6 +17,7 @@ const transporter = nodemailer.createTransport({
         pass: 'cbgcwsgpajyhvztj'
     },
 });
+
 
 let LoginAdmin = async (req, res, next) => {
     try {
@@ -63,14 +64,19 @@ let RefreshToken = async (req, res, next) => {
 let SignupAdmin = async (req, res, next) => {
     const secret = speakeasy.generateSecret({ length: 20 });
     const { email, password, name, mobile, city, state, address, pinCode, schoolName, affiliationNumber } = req.body;
-
     try {
         const existingUser = await AdminUserModel.findOne({ email });
-
         if (existingUser) {
             return res.status(400).json({ errorMsg: "Email already exists!" });
         }
-
+        let schoolId = 0;
+        let lastIssuedSchoolId = await AdminUserModel.findOne({}).sort({ _id: -1 });
+        if (!lastIssuedSchoolId) {
+            schoolId = 100001 + schoolId;
+        }
+        if (lastIssuedSchoolId) {
+            schoolId = lastIssuedSchoolId.schoolId + 1;
+        }
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const userData = {
@@ -83,7 +89,8 @@ let SignupAdmin = async (req, res, next) => {
             address,
             pinCode,
             schoolName,
-            affiliationNumber
+            affiliationNumber,
+            schoolId: schoolId
         };
 
         const [createdUser, createdOTP] = await Promise.all([
@@ -111,17 +118,17 @@ let ForgotPassword = async (req, res, next) => {
             return res.status(404).json({ errorMsg: 'Email address not found !' });
         }
         const verified = admin.verified;
-        if(verified==false){
+        if (verified == false) {
             return res.status(400).json({ errorMsg: 'Acoount is not verified, please verify your email address!' });
         }
-            const createdOTP = await OTPModel.create({ email, secret: secret.base32 });
-            const token = speakeasy.totp({
-                secret: createdOTP.secret,
-                encoding: 'base32'
-            });
-            sendEmail(email, token);
-            return res.status(200).json({ successMsg: 'Forgot password otp send successfully.', email:email });
-        
+        const createdOTP = await OTPModel.create({ email, secret: secret.base32 });
+        const token = speakeasy.totp({
+            secret: createdOTP.secret,
+            encoding: 'base32'
+        });
+        sendEmail(email, token);
+        return res.status(200).json({ successMsg: 'Forgot password otp send successfully.', email: email });
+
     } catch (error) {
         return res.status(500).json({ errorMsg: 'Internal Server Error !' });
     }

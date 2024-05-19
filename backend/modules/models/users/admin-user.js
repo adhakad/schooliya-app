@@ -6,16 +6,16 @@ const AdminModel = mongoose.model('admin-users', {
         type: String,
         required: true,
         trim: true,
-        unique:true,
+        unique: true,
     },
     password: {
         type: String,
         required: true,
         trim: true,
     },
-    verified:{
-        type:Boolean,
-        default:false
+    verified: {
+        type: Boolean,
+        default: false
     },
     name: {
         type: String,
@@ -47,7 +47,7 @@ const AdminModel = mongoose.model('admin-users', {
         required: true,
         trim: true,
     },
-      pinCode: {
+    pinCode: {
         type: Number,
         required: true,
         trim: true,
@@ -56,12 +56,18 @@ const AdminModel = mongoose.model('admin-users', {
         type: String,
         required: true,
         trim: true,
-      },
-      affiliationNumber: {
+    },
+    affiliationNumber: {
         type: String,
         required: true,
         trim: true,
-      },
+    },
+    schoolId: {
+        type: Number,
+        required: true,
+        trim: true,
+        unique: true
+    }
     // status: {
     //     type: String,
     //     trim: true,

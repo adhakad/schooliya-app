@@ -34,6 +34,7 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
   adminId!: string;
   constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private adminAuthService: AdminAuthService, private classSubjectService: ClassSubjectService, private admitCardStructureService: AdmitCardStructureService) {
     this.admitcardForm = this.fb.group({
+      adminId:[''],
       class: [''],
       examType: ['', Validators.required],
       stream: [''],
@@ -96,9 +97,14 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
   }
 
   getAdmitCardStructureByClass(cls: any) {
-    this.admitCardStructureService.admitCardStructureByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.admitCardStructureService.admitCardStructureByClass(params).subscribe((res: any) => {
       if (res) {
         this.examAdmitCard = res;
+        console.log(this.examAdmitCard)
         setTimeout(() => {
           this.loader = false;
         }, 1000)
@@ -255,6 +261,7 @@ export class AdminStudentAdmitCardStructureComponent implements OnInit {
       const formattedDate = `${day}.${month}.${year}`;
       return { [subject]: formattedDate };
     });
+    this.admitcardForm.value.adminId = this.adminId;
     this.admitcardForm.value.class = this.cls;
     this.admitcardForm.value.stream = this.stream;
     let examDateObj = this.admitcardForm.value.type.examDate;

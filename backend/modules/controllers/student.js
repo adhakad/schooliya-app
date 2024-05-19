@@ -105,7 +105,7 @@ let GetStudentPaginationByClass = async (req, res, next) => {
         let serialNo = 0;
         let lastIssuedTransferCertificate = await IssuedTransferCertificateModel.findOne({}).sort({ _id: -1 });
         if (!lastIssuedTransferCertificate) {
-            serialNo = 1;
+            serialNo = 1 + serialNo;
         }
         if (lastIssuedTransferCertificate) {
             serialNo = lastIssuedTransferCertificate.serialNo + 1;

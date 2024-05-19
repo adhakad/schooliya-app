@@ -25,6 +25,7 @@ export class AdmitCardComponent implements OnInit {
   adminId!:any;
   constructor(private fb: FormBuilder,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private admitCardService: AdmitCardService, private classService: ClassService) {
     this.admitCardForm = this.fb.group({
+      schoolId: ['', [Validators.required, Validators.maxLength(10)]],
       admissionNo: ['', Validators.required],
       class: ['', Validators.required],
       rollNumber: ['', Validators.required],

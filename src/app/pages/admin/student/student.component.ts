@@ -316,7 +316,6 @@ export class StudentComponent implements OnInit {
     this.studentService.getStudentByClass(params).subscribe((res: any) => {
       if (res) {
         this.studentInfoByClass = res;
-        console.log(res)
         const classMappings: any = {
           200: "Nursery",
           201: "LKG",

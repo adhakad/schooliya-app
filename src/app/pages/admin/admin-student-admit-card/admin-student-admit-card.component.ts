@@ -64,7 +64,11 @@ export class AdminStudentAdmitCardComponent implements OnInit {
     this.streamSection = false;
   }
   getAdmitCardStructureByClass(cls: any) {
-    this.admitCardStructureService.admitCardStructureByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId
+    }
+    this.admitCardStructureService.admitCardStructureByClass(params).subscribe((res: any) => {
       if (res) {
         this.admitCardStrInfo = res;
         for(let i=0;i<res.length;i++){
@@ -161,7 +165,11 @@ export class AdminStudentAdmitCardComponent implements OnInit {
   }
 
   getStudentAdmitCardByClass(cls: any) {
-    this.admitCardService.getAllStudentAdmitCardByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.admitCardService.getAllStudentAdmitCardByClass(params).subscribe((res: any) => {
       if (res) {
         this.admitCardInfo = res.admitCardInfo;
         this.studentInfo = res.studentInfo;
