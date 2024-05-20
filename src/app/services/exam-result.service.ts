@@ -22,8 +22,8 @@ export class ExamResultService {
   singleStudentExamResultById(studentId: any) {
     return this.http.get(`${this.url}/student/${studentId}`);
   }
-  getAllStudentExamResultByClass(cls:any){
-    return this.http.get(`${this.url}/class/${cls}`);
+  getAllStudentExamResultByClass(params:any){
+    return this.http.get(`${this.url}/admin/${params.adminId}/class/${params.class}`);
   }
   updateExamResult(examForm:any){
     return this.http.put(`${this.url}`,examForm);

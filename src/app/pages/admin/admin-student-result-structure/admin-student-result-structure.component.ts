@@ -48,6 +48,7 @@ export class AdminStudentResultStructureComponent implements OnInit {
   adminId!:string;
   constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute,private adminAuthService: AdminAuthService, private classSubjectService: ClassSubjectService, private examResultStructureService: ExamResultStructureService) {
     this.examResultForm = this.fb.group({
+      adminId:[''],
       class: [''],
       examType: ['', Validators.required],
       stream: [''],
@@ -150,7 +151,11 @@ export class AdminStudentResultStructureComponent implements OnInit {
     }, 1000)
   }
   getExamResultStructureByClass(cls: any) {
-    this.examResultStructureService.examResultStructureByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.examResultStructureService.examResultStructureByClass(params).subscribe((res: any) => {
       if (res) {
         this.examResultStr = res;
         setTimeout(() => {
@@ -265,7 +270,8 @@ export class AdminStudentResultStructureComponent implements OnInit {
     })
   }
 
-  examResultAddUpdate() {
+  examResultAddUpdate() { 
+    this.examResultForm.value.adminId = this.adminId;
     this.examResultForm.value.class = this.cls;
     this.examResultForm.value.stream = this.stream;
     if (this.gradeRange) {

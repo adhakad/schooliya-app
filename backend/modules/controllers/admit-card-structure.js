@@ -94,10 +94,11 @@ let DeleteAdmitCardStructure = async (req, res, next) => {
     try {
         const id = req.params.id;
         const admitCard = await AdmitCardStructureModel.findOne({ _id: id });
+        const adminId = admitCard.adminId;
         const className = admitCard.class;
         const stream = admitCard.stream;
         const examType = admitCard.examType;
-        const deleteAdmitCard = await AdmitCardModel.deleteMany({ class: className, stream: stream, examType: examType });
+        const deleteAdmitCard = await AdmitCardModel.deleteMany({adminId:adminId, class: className, stream: stream, examType: examType });
         const deleteAdmitCardStructure = await AdmitCardStructureModel.findByIdAndRemove(id);
         if (deleteAdmitCard && deleteAdmitCardStructure) {
             return res.status(200).json('Admit card structure delete successfully.');
@@ -114,10 +115,10 @@ let ChangeAdmitCardPublishStatus = async (req, res, next) => {
         if (!admitCardStr) {
             return res.status(200).json('Admit card structure not found !');
         }
-        const findAdmitCardPublishStatus = await admitCardStr.admitCardPublishStatus;
-        const cls = await admitCardStr.class;
-        const stream = await admitCardStr.stream;
-        const examType = await admitCardStr.examType;
+        const findAdmitCardPublishStatus = admitCardStr.admitCardPublishStatus;
+        const cls = admitCardStr.class;
+        const stream = admitCardStr.stream;
+        const examType = admitCardStr.examType;
         let title = '';
         let message = '';
         if (findAdmitCardPublishStatus == false) {

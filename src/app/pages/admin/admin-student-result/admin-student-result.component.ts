@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { read, utils, writeFile } from 'xlsx';
 import { ExamResultService } from 'src/app/services/exam-result.service';
 import { MatRadioChange } from '@angular/material/radio';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { ExamResultStructureService } from 'src/app/services/exam-result-structure.service';
 
 @Component({
@@ -43,9 +44,10 @@ export class AdminStudentResultComponent implements OnInit {
   examType: any[] = ["quarterly", "half yearly", "final"];
   streamMainSubject: any[] = ['Mathematics(Science)', 'Biology(Science)', 'History(Arts)', 'Sociology(Arts)', 'Political Science(Arts)', 'Accountancy(Commerce)', 'Economics(Commerce)', 'Agriculture', 'Home Science'];
   loader:Boolean=true;
-
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private examResultService: ExamResultService, private examResultStructureService: ExamResultStructureService) {
+  adminId!:string;
+  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute,private adminAuthService: AdminAuthService, private examResultService: ExamResultService, private examResultStructureService: ExamResultStructureService) {
     this.examResultForm = this.fb.group({
+      adminId:[''],
       rollNumber: ['', Validators.required],
       examType: [''],
       stream: [''],
@@ -59,6 +61,8 @@ export class AdminStudentResultComponent implements OnInit {
 
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     this.cls = this.activatedRoute.snapshot.paramMap.get('id');
     this.getStudentExamResultByClass(this.cls);
   }
@@ -124,7 +128,11 @@ export class AdminStudentResultComponent implements OnInit {
   }
 
   getStudentExamResultByClass(cls: any) {
-    this.examResultService.getAllStudentExamResultByClass(cls).subscribe((res: any) => {
+    let params = {
+      class:cls,
+      adminId:this.adminId,
+    }
+    this.examResultService.getAllStudentExamResultByClass(params).subscribe((res: any) => {
       if (res) {
         this.examResultInfo = res.examResultInfo;
         this.studentInfo = res.studentInfo;
@@ -170,6 +178,7 @@ export class AdminStudentResultComponent implements OnInit {
     this.selectedExam = selectedExam;
     if (this.stream && selectedExam && this.cls) {
       let params = {
+        adminId:this.adminId,
         cls: this.cls,
         stream: this.stream,
         examType: selectedExam,
@@ -185,6 +194,7 @@ export class AdminStudentResultComponent implements OnInit {
     this.stream = stream;
     if (stream && this.selectedExam && this.cls) {
       let params = {
+        adminId:this.adminId,
         cls: this.cls,
         stream: stream,
         examType: this.selectedExam,
@@ -251,6 +261,7 @@ export class AdminStudentResultComponent implements OnInit {
 
   examResultAddUpdate() {
     if (this.examResultForm.valid) {
+      this.examResultForm.value.adminId = this.adminId;
       if (this.updateMode) {
         this.examResultService.updateExamResult(this.examResultForm.value).subscribe((res: any) => {
           if (res) {

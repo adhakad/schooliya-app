@@ -10,14 +10,13 @@ export class ExamResultStructureService {
   constructor(private http: HttpClient) { }
 
   addExamResultStructure(examResultForm:any) {
-    console.log(examResultForm)
     return this.http.post(`${this.url}`,examResultForm);
   }
-  examResultStructureByClass(cls: any) {
-    return this.http.get(`${this.url}/${cls}`);
+  examResultStructureByClass(params: any) {
+    return this.http.get(`${this.url}/admin/${params.adminId}/class/${params.class}`);
   }
   getSingleClassResultStrucByStream(params: any) {
-    return this.http.get(`${this.url}/class/${params.cls}/stream/${params.stream}/exam/${params.examType}`);
+    return this.http.get(`${this.url}/admin/${params.adminId}/class/${params.cls}/stream/${params.stream}/exam/${params.examType}`);
   }
   changeResultPublishStatus(params:any){
     return this.http.put(`${this.url}/result-publish-status/${params.id}`,params);

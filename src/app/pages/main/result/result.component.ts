@@ -26,6 +26,7 @@ export class ResultComponent implements OnInit {
   adminId!:any;
   constructor(private fb: FormBuilder,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private examResultService: ExamResultService, private classService: ClassService) {
     this.examResultForm = this.fb.group({
+      schoolId: ['', [Validators.required, Validators.maxLength(10)]],
       admissionNo: ['', Validators.required],
       class: ['', Validators.required],
       rollNumber: ['', Validators.required],
