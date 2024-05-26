@@ -48,7 +48,7 @@ export class StudentResultComponent implements OnInit {
   examResult(studentId: any) {
     this.examResultService.singleStudentExamResultById(studentId).subscribe((res: any) => {
       if (res) {
-
+        this.loader = true;
         this.studentInfo = res.studentInfo;
         let examResult = res.examResult;
         this.resultStructureInfo = res.examResultStructure;
@@ -76,6 +76,7 @@ export class StudentResultComponent implements OnInit {
           resultStatus = 'FAIL';
         }
 
+
         let grandTotalMarks = 0;
         let percentileGrade: string = "";
         let percentile: number = 0;
@@ -97,26 +98,35 @@ export class StudentResultComponent implements OnInit {
 
             return total + maxMarks;
           }, 0);
+
           const totalMaxMarks: number = totalTheoryMaxMarks + totalPracticalMaxMarks;
+
 
           this.examResultInfo = {
             class: examResult.class,
             examType: examResult.examType,
             rollNumber: examResult.rollNumber,
-            resultNo: examResult.resultNo,
+            admissionNo: examResult.admissionNo,
             marks: examResult.theoryMarks.map((subjectMarks: any) => {
               const subjectName = Object.keys(subjectMarks)[0];
               const theoryMarks = parseFloat(subjectMarks[subjectName]);
               const practicalMarkObject = examResult.practicalMarks.find((practicalMark: any) => Object.keys(practicalMark)[0] === subjectName);
               const practicalMark = practicalMarkObject ? parseFloat(practicalMarkObject[subjectName]) : 0;
               const totalMarks = theoryMarks + practicalMark;
+
+              const theoryMaxMarks = this.resultStructureInfo.theoryMaxMarks.find((theoryMaxMarks: any) => theoryMaxMarks.hasOwnProperty(subjectName))[subjectName];
+              const practicalMaxMarkObject = this.resultStructureInfo.practicalMaxMarks.find((practicalMaxMark: any) => Object.keys(practicalMaxMark)[0] === subjectName);
+              const practicalMaxMark = practicalMaxMarkObject ? parseFloat(practicalMaxMarkObject[subjectName]) : 0;
+              const totalMaxMark = parseFloat(theoryMaxMarks) + practicalMaxMark;
+              const totalGettingMarksPercentile = (totalMarks / totalMaxMark) * 100;
+              const fixedTotalGettingMarksPercentile = totalGettingMarksPercentile.toFixed(0)
               let grade = '';
               const gradeMaxMarks = this.resultStructureInfo.gradeMaxMarks;
               const gradeMinMarks = this.resultStructureInfo.gradeMinMarks;
               for (let i = 0; i < gradeMaxMarks.length; i++) {
                 const gradeRange: any = Object.values(gradeMaxMarks[i])[0];
-                if (totalMarks >= gradeMinMarks[i][Object.keys(gradeMinMarks[i])[0]] &&
-                  totalMarks <= gradeRange) {
+                if (fixedTotalGettingMarksPercentile >= gradeMinMarks[i][Object.keys(gradeMinMarks[i])[0]] &&
+                  fixedTotalGettingMarksPercentile <= gradeRange) {
                   grade = Object.keys(gradeMaxMarks[i])[0];
                   break;
                 }
@@ -130,6 +140,7 @@ export class StudentResultComponent implements OnInit {
               };
             })
           };
+
           grandTotalMarks = this.examResultInfo.marks.reduce((total: number, item: any) => {
             return total + item.totalMarks;
           }, 0);
@@ -146,6 +157,7 @@ export class StudentResultComponent implements OnInit {
               }
             }
           }
+
           this.examResultInfo.grandTotalMarks = grandTotalMarks;
           this.examResultInfo.totalMaxMarks = totalMaxMarks;
           this.examResultInfo.percentile = percentile;
@@ -168,7 +180,7 @@ export class StudentResultComponent implements OnInit {
             class: examResult.class,
             examType: examResult.examType,
             rollNumber: examResult.rollNumber,
-            resultNo: examResult.resultNo,
+            admissionNo: examResult.admissionNo,
             marks: examResult.theoryMarks.map((subjectMarks: any) => {
               const subjectName = Object.keys(subjectMarks)[0];
               const theoryMarks = parseFloat(subjectMarks[subjectName])
@@ -218,7 +230,7 @@ export class StudentResultComponent implements OnInit {
         }
         setTimeout(() => {
           this.loader = false;
-        }, 1000)
+        }, 500)
       }
     }, err => {
       this.errorMsg = err.error.errorMsg;

@@ -11,22 +11,19 @@ export class TeacherService {
   url = `${environment.API_URL}/v1/teacher`;
   constructor(private http:HttpClient) { }
 
-  addTeacher(teacherData:Teacher){
-    var formData: any = new FormData();
-    formData.append('name',teacherData.name);
-    formData.append('teacherUserId',teacherData.teacherUserId);
-    formData.append('education',teacherData.education);
-    formData.append('image',teacherData.image);
+  addTeacher(formData:any){
+    // var formData: any = new FormData();
+    // formData.append('name',teacherData.name);
+    // formData.append('teacherUserId',teacherData.teacherUserId);
+    // formData.append('education',teacherData.education);
+    // formData.append('image',teacherData.image);
     return this.http.post(this.url,formData);
   }
   addTeacherPermission(formData:any){
-    return this.http.put(`${this.url}/permission/${formData._id}`,formData);
+    return this.http.put(`${this.url}/permission/admin/${formData.adminId}/teacher/${formData._id}`,formData);
   }
   getTeacherById(id:string) {
     return this.http.get<any[]>(`${this.url}/${id}`);
-  }
-  getTeacherList() {
-    return this.http.get<Teacher[]>(this.url);
   }
   getTeacherCount() {
     return this.http.get(`${this.url}/teacher-count`);

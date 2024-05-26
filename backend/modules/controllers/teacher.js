@@ -9,6 +9,7 @@ let countTeacher = async (req, res, next) => {
 }
 let GetTeacherPagination = async (req, res, next) => {
     let searchText = req.body.filters.searchText;
+    let adminId = req.body.adminId;
     let searchObj = {};
     if (searchText) {
         searchObj = /^(?:\d*\.\d{1,2}|\d+)$/.test(searchText)
@@ -21,7 +22,7 @@ let GetTeacherPagination = async (req, res, next) => {
     try {
         let limit = (req.body.limit) ? parseInt(req.body.limit) : 10;
         let page = req.body.page || 1;
-        const teacherList = await TeacherModel.find(searchObj).sort({ _id: -1 })
+        const teacherList = await TeacherModel.find({ adminId: adminId }).find(searchObj).sort({ _id: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
@@ -35,36 +36,18 @@ let GetTeacherPagination = async (req, res, next) => {
         return res.status(500).json('Internal Server Error !');
     }
 }
-let GetAllTeacher = async (req, res, next) => {
-    try {
-        const teacherList = await TeacherModel.find({}).sort({ _id: -1 });
-        return res.status(200).json(teacherList);
-    } catch (error) {
-        return res.status(500).json('Internal Server Error !');
-    }
-}
-let GetSingleTeacher = async (req, res, next) => {
-    try {
-        const singleTeacherUser = await TeacherUserModel.findOne({ _id: req.params.id },'-password');
-        // if(!singleTeacher){
-        //     return res.status(404).json('Invalid User');
-        // }
-        let teacherId = singleTeacherUser.teacherId;
-        const singleTeacher = await TeacherModel.findOne({_id:teacherId});
-        return res.status(200).json(singleTeacher);
-    } catch (error) {
-        return res.status(500).json('Internal Server Error !');
-    }
-}
+
 let CreateTeacher = async (req, res, next) => {
     let otp = Math.floor(Math.random() * 899999 + 100000);
-    const { name, teacherUserId, education } = req.body;
+    const { adminId, name, teacherUserId, education } = req.body;
+    console.log(req.body)
     try {
-        const checkTeacher = await TeacherModel.findOne({ teacherUserId: teacherUserId });
+        const checkTeacher = await TeacherModel.findOne({ adminId: adminId, teacherUserId: teacherUserId });
         if (checkTeacher) {
             return res.status(400).json("Teacher user id already exist !")
         }
         const teacherData = {
+            adminId: adminId,
             name: name,
             teacherUserId: teacherUserId,
             education: education,
@@ -78,8 +61,13 @@ let CreateTeacher = async (req, res, next) => {
 }
 let TeacherPermission = async (req, res, next) => {
     try {
-        const id = req.params.id;
+        const adminId = req.params.id;
+        const teacherId = req.params.teacherId;
         let { resultPermission, admitCardPermission, studentPermission, admissionPermission, feeCollectionPermission } = req.body.type;
+        const checkTeacher = await TeacherModel.findOne({ _id: teacherId, adminId: adminId });
+        if (!checkTeacher) {
+            return res.status(400).json("Invalid Request !")
+        }
         let resultClass = [];
         let studentClass = [];
         let admissionClass = [];
@@ -124,7 +112,7 @@ let TeacherPermission = async (req, res, next) => {
                 classes: resultClass.length > 0 ? resultClass : [0],
             },
             admitCardPermission: {
-                status: admitCardClass.length > 0  ? true : false,
+                status: admitCardClass.length > 0 ? true : false,
                 classes: admitCardClass.length > 0 ? admitCardClass : [0],
             },
             studentPermission: {
@@ -140,8 +128,8 @@ let TeacherPermission = async (req, res, next) => {
                 classes: feeCollectionClass.length > 0 ? feeCollectionClass : [0],
             },
         };
-        
-        const updateTeacher = await TeacherModel.findByIdAndUpdate(id, { $set: teacherData }, { new: true });
+
+        const updateTeacher = await TeacherModel.findByIdAndUpdate(teacherId, { $set: teacherData }, { new: true });
         return res.status(200).json('Teacher permissions set successfully.');
     } catch (error) {
         return res.status(500).json('Internal Server Error !');
@@ -150,8 +138,9 @@ let TeacherPermission = async (req, res, next) => {
 let UpdateTeacher = async (req, res, next) => {
     try {
         const id = req.params.id;
-        const { name, education } = req.body;
+        const { adminId, name, education } = req.body;
         const teacherData = {
+            adminId: adminId,
             name: name,
             education: education
         }
@@ -189,8 +178,6 @@ let DeleteTeacher = async (req, res, next) => {
 module.exports = {
     countTeacher,
     GetTeacherPagination,
-    GetAllTeacher,
-    GetSingleTeacher,
     CreateTeacher,
     UpdateTeacher,
     TeacherPermission,

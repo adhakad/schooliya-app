@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { TeacherService } from 'src/app/services/teacher.service';
 import { Teacher } from 'src/app/modal/teacher.model';
 
@@ -25,22 +26,26 @@ export class TeacherComponent implements OnInit {
   number: number = 0;
   paginationValues: Subject<any> = new Subject();
   page: Number = 0;
-  loader:Boolean=true;
-  constructor(private fb: FormBuilder, private teacherService: TeacherService) {
+  loader: Boolean = true;
+  adminId!: String
+  constructor(private fb: FormBuilder, private adminAuthService: AdminAuthService, private teacherService: TeacherService) {
     this.teacherForm = this.fb.group({
       _id: [''],
+      adminId: [''],
       name: ['', [Validators.required, Validators.pattern('^[a-zA-Z\\s]+$')]],
-      teacherUserId: ['', [Validators.required, Validators.pattern(/^\d{6}$/),Validators.pattern('^[0-9]+$')]],
+      teacherUserId: ['', [Validators.required, Validators.pattern(/^\d{6}$/), Validators.pattern('^[0-9]+$')]],
       education: ['', [Validators.required, Validators.pattern('^[a-zA-Z.\\s]+$')]],
     })
   }
 
   ngOnInit(): void {
-    let load:any =this.getTeacher({ page: 1 });
-    if(load){
-      setTimeout(()=>{
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
+    let load: any = this.getTeacher({ page: 1 });
+    if (load) {
+      setTimeout(() => {
         this.loader = false;
-      },1000);
+      }, 1000);
     }
   }
 
@@ -50,7 +55,8 @@ export class TeacherComponent implements OnInit {
       let params: any = {
         filters: {},
         page: $event.page,
-        limit: $event.limit ? $event.limit : this.recordLimit
+        limit: $event.limit ? $event.limit : this.recordLimit,
+        adminId: this.adminId
       };
       this.recordLimit = params.limit;
       if (this.filters.searchText) {
@@ -60,7 +66,6 @@ export class TeacherComponent implements OnInit {
       this.teacherService.teacherPaginationList(params).subscribe((res: any) => {
         if (res) {
           this.teacherInfo = res.teacherList;
-          console.log(this.teacherInfo)
           this.number = params.page;
           this.paginationValues.next({ type: 'page-init', page: params.page, totalTableRecords: res.countTeacher });
           return resolve(true);
@@ -102,6 +107,7 @@ export class TeacherComponent implements OnInit {
   }
   teacherAddUpdate() {
     if (this.teacherForm.valid) {
+      this.teacherForm.value.adminId = this.adminId;
       if (this.updateMode) {
         this.teacherService.updateTeacher(this.teacherForm.value).subscribe((res: any) => {
           if (res) {
@@ -132,7 +138,6 @@ export class TeacherComponent implements OnInit {
         id: id,
         statusValue: statusValue,
       }
-      console.log(this.paginationValues)
       this.teacherService.changeStatus(params).subscribe((res: any) => {
         if (res) {
           this.getTeacher({ page: this.page });

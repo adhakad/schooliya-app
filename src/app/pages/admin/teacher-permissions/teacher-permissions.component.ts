@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Subject } from 'rxjs';
+import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { TeacherService } from 'src/app/services/teacher.service';
 import { Teacher } from 'src/app/modal/teacher.model';
 import { ClassService } from 'src/app/services/class.service';
@@ -31,9 +32,11 @@ export class TeacherPermissionsComponent implements OnInit {
   teacherObjId: string = '';
 
   loader: Boolean = true;
-  constructor(private fb: FormBuilder, private teacherService: TeacherService, private classService: ClassService) {
+  adminId!: String
+  constructor(private fb: FormBuilder,private adminAuthService: AdminAuthService, private teacherService: TeacherService, private classService: ClassService) {
     this.teacherPermissionForm = this.fb.group({
       _id: [''],
+      adminId:this.adminId,
       type: this.fb.group({
         resultPermission: this.fb.array([], [Validators.required]),
         admitCardPermission: this.fb.array([], [Validators.required]),
@@ -45,6 +48,8 @@ export class TeacherPermissionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
+    this.adminId = getAdmin?.id;
     let load: any = this.getTeacher({ page: 1 });
     this.getClass();
     if (load) {
@@ -115,7 +120,8 @@ export class TeacherPermissionsComponent implements OnInit {
       let params: any = {
         filters: {},
         page: $event.page,
-        limit: $event.limit ? $event.limit : this.recordLimit
+        limit: $event.limit ? $event.limit : this.recordLimit,
+        adminId:this.adminId,
       };
       this.recordLimit = params.limit;
       if (this.filters.searchText) {
@@ -237,6 +243,7 @@ export class TeacherPermissionsComponent implements OnInit {
   teacherPermissionAdd() {
     this.patch();
     this.teacherPermissionForm.value._id = this.teacherObjId;
+    this.teacherPermissionForm.value.adminId = this.adminId;
     this.teacherService.addTeacherPermission(this.teacherPermissionForm.value).subscribe((res: any) => {
       if (res) {
         this.successDone();

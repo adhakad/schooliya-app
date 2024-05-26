@@ -23,8 +23,8 @@ export class ResultComponent implements OnInit {
   resultStructureInfo: any;
   processedData: any[] = [];
   loader: Boolean = false;
-  adminId!:any;
-  constructor(private fb: FormBuilder,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private examResultService: ExamResultService, private classService: ClassService) {
+  adminId!: any;
+  constructor(private fb: FormBuilder, private adminAuthService: AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private examResultService: ExamResultService, private classService: ClassService) {
     this.examResultForm = this.fb.group({
       schoolId: ['', [Validators.required, Validators.maxLength(10)]],
       admissionNo: ['', Validators.required],
@@ -62,10 +62,12 @@ export class ResultComponent implements OnInit {
       }
     })
   }
+
+
   examResult() {
     this.examResultService.singleStudentExamResult(this.examResultForm.value).subscribe((res: any) => {
       if (res) {
-        this.loader =true;
+        this.loader = true;
         this.studentInfo = res.studentInfo;
         let examResult = res.examResult;
         this.resultStructureInfo = res.examResultStructure;
@@ -131,15 +133,19 @@ export class ResultComponent implements OnInit {
               const practicalMark = practicalMarkObject ? parseFloat(practicalMarkObject[subjectName]) : 0;
               const totalMarks = theoryMarks + practicalMark;
 
-
+              const theoryMaxMarks = this.resultStructureInfo.theoryMaxMarks.find((theoryMaxMarks: any) => theoryMaxMarks.hasOwnProperty(subjectName))[subjectName];
+              const practicalMaxMarkObject = this.resultStructureInfo.practicalMaxMarks.find((practicalMaxMark: any) => Object.keys(practicalMaxMark)[0] === subjectName);
+              const practicalMaxMark = practicalMaxMarkObject ? parseFloat(practicalMaxMarkObject[subjectName]) : 0;
+              const totalMaxMark = parseFloat(theoryMaxMarks) + practicalMaxMark;
+              const totalGettingMarksPercentile = (totalMarks / totalMaxMark) * 100;
+              const fixedTotalGettingMarksPercentile = totalGettingMarksPercentile.toFixed(0)
               let grade = '';
               const gradeMaxMarks = this.resultStructureInfo.gradeMaxMarks;
               const gradeMinMarks = this.resultStructureInfo.gradeMinMarks;
-
               for (let i = 0; i < gradeMaxMarks.length; i++) {
                 const gradeRange: any = Object.values(gradeMaxMarks[i])[0];
-                if (totalMarks >= gradeMinMarks[i][Object.keys(gradeMinMarks[i])[0]] &&
-                  totalMarks <= gradeRange) {
+                if (fixedTotalGettingMarksPercentile >= gradeMinMarks[i][Object.keys(gradeMinMarks[i])[0]] &&
+                  fixedTotalGettingMarksPercentile <= gradeRange) {
                   grade = Object.keys(gradeMaxMarks[i])[0];
                   break;
                 }
@@ -153,7 +159,6 @@ export class ResultComponent implements OnInit {
               };
             })
           };
-
 
           grandTotalMarks = this.examResultInfo.marks.reduce((total: number, item: any) => {
             return total + item.totalMarks;
@@ -188,12 +193,8 @@ export class ResultComponent implements OnInit {
 
             return total + maxMarks;
           }, 0);
-
           const totalPracticalMaxMarks: number = 0;
-
           const totalMaxMarks: number = totalTheoryMaxMarks + totalPracticalMaxMarks;
-
-
           this.examResultInfo = {
             class: examResult.class,
             examType: examResult.examType,
@@ -248,7 +249,7 @@ export class ResultComponent implements OnInit {
         }
         setTimeout(() => {
           this.loader = false;
-        }, 1500)
+        }, 500)
 
       }
     }, err => {

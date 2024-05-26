@@ -2,6 +2,11 @@
 const mongoose = require('mongoose');
 
 const TeacherUserModel = mongoose.model('teacher-user', {
+    adminId: {
+        type: String,
+        required: true,
+        trim: true
+      },
     teacherId: {
         type: String,
         required: true,

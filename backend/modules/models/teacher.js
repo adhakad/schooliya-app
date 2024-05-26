@@ -2,6 +2,11 @@
 const mongoose = require('mongoose');
 
 const TeacherModel = mongoose.model('teacher', {
+    adminId: {
+        type: String,
+        required: true,
+        trim: true
+    },
     name: {
         type: String,
         required: true,
@@ -26,60 +31,60 @@ const TeacherModel = mongoose.model('teacher', {
         status: {
             type: Boolean,
             required: true,
-            default:false
+            default: false
         },
         classes: {
             type: [Number],
             required: true,
-            default:[0]
+            default: [0]
         }
     },
     studentPermission: {
         status: {
             type: Boolean,
             required: true,
-            default:false
+            default: false
         },
         classes: {
             type: [Number],
             required: true,
-            default:[0]
+            default: [0]
         }
     },
     admissionPermission: {
         status: {
             type: Boolean,
             required: true,
-            default:false
+            default: false
         },
         classes: {
             type: [Number],
             required: true,
-            default:[0]
+            default: [0]
         }
     },
     admitCardPermission: {
         status: {
             type: Boolean,
             required: true,
-            default:false
+            default: false
         },
         classes: {
             type: [Number],
             required: true,
-            default:[0]
+            default: [0]
         }
     },
     feeCollectionPermission: {
         status: {
             type: Boolean,
             required: true,
-            default:false
+            default: false
         },
         classes: {
             type: [Number],
             required: true,
-            default:[0]
+            default: [0]
         }
     },
     status: {

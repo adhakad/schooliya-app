@@ -10,11 +10,24 @@
           <div class="col-lg-12 offset-lg-0">
             <div class="main-card">
               <div class="row mt-4 mb-2">
-                <div class="col-8 col-lg-5">
+                <div class="col-12 col-lg-2">
                   <h3>Admit Card ><span>
                       {{cls | classSuffix}}</span></h3>
                 </div>
-                <div class="col-4 col-lg-2 offset-lg-5">
+                <div class="col-lg-6 radio-btn-mobile mb-3">
+                  <mat-radio-group (change)="onChange($event)">
+                    <mat-radio-button [value]="0" [checked]="selectedValue==0">One Admit Card Print on Single Page</mat-radio-button>
+                    <mat-radio-button [value]="1" [checked]="selectedValue==1">Two Admit Card Print on Single Page</mat-radio-button>
+                  </mat-radio-group>
+                </div>
+                <!-- <div class="col-12 radio-btn-mobile mb-3">
+                  <mat-radio-group >
+                    <mat-radio-button [value]="0" [checked]="selectedValue==0">Single Create</mat-radio-button>
+                    <mat-radio-button [value]="1" [checked]="selectedValue==1">Bulk Import</mat-radio-button>
+                    <mat-radio-button [value]="2" [checked]="selectedValue==2">Bulk Export</mat-radio-button>
+                  </mat-radio-group>
+                </div> -->
+                <div class="col-lg-2 offset-lg-2">
                   <button class="submit-button print-pdf" mat-raised-button (click)="bulkPrint()"><mat-icon
                       style="font-size: 20px;">print</mat-icon> Bulk Print</button>
                 </div>
@@ -89,31 +102,35 @@
                         </section>
                       </ng-container>
 
-                      <ng-container *ngIf="selectedStream">
+                      <ng-container *ngIf="selectedStream && selectedValue==0">
                         <ng-container *ngFor="let student of allAdmitCardsByStream,let i = index;">
                           <p>{{i+1}}.</p><div id="student-{{student.studentId}}">
                             <div class="col-lg-10 offset-lg-1 custom-container">
                               <div class="table-container">
-                                <div class="row text-center">
-                                  <div class="col-12" style="text-align: center;">
-                                    <div class="school-name"> <img class="logo" src="../../../../assets/logo.png"
-                                        alt="">
+                                <div class="row">
+                                  <div class="col-2">
+                                    <img class="logo" src="../../../../assets/logo.png" alt="">
+                                  </div>
+                                  <div class="col-10" style="text-align: center;">
+                                    <div class="school-name"> 
                                       <h3 class="text-bold">{{schoolInfo?.schoolName | uppercase}}, {{schoolInfo?.city | uppercase}}</h3>
-                                    </div>
-                                    <div class="address">
-                                      <p>( {{schoolInfo?.board}} Affiliation No.- {{schoolInfo?.affiliationNumber}} )
+                                     </div>
+                                    <div class="address" style="text-align: center;">
+                                      <p>( {{schoolInfo?.board}} Affiliation No.- {{schoolInfo?.affiliationNumber}},
+                                        School Code - {{schoolInfo?.schoolCode}} )
                                       </p>
-                                      <p><span>{{schoolInfo?.street}},{{schoolInfo?.city}},District- {{schoolInfo?.district}},
-                                          {{schoolInfo?.state}}, {{schoolInfo?.pinCode}}</span></p>
                                       <p><span>Contact - {{schoolInfo?.phoneOne}} &nbsp; Email -
-                                          {{schoolInfo?.email}}</span></p>
+                                        {{schoolInfo?.email}}</span></p>
+                                      <p><span>{{schoolInfo?.street}},{{schoolInfo?.city}},District-
+                                          {{schoolInfo?.district}},
+                                          {{schoolInfo?.state}}</span></p>
                                       <p><span>Website - {{baseURL}}</span></p>
                                     </div>
                                   </div>
                                 </div>
                                 <div class="row">
                                   <div class="col-12" class="title-lable">
-                                    <p>{{student?.examType | uppercase}} EXAM ADMIT CARD</p>
+                                    <p>{{student?.examType | uppercase}} EXAM ADMIT CARD {{student?.session}}</p>
                                   </div>
                                 </div>
                                 <table class="custom-table" style="margin-top: -10px;margin-bottom:10px;border: none;">
@@ -166,6 +183,14 @@
                                     </tr>
                                   </ng-container>
                                 </table>
+                                <table class="custom-table" style="border: none;margin-top: 20px;margin-bottom: 30px;">
+                                  <tr>
+                                    <td class="text-bold"
+                                      style="width:50%;padding-left:10%;text-align: left;border: none;">Class Teacher (Signature)</td>
+                                    <td class="text-bold"
+                                      style="width:50%;padding-right:10%;text-align: right;border: none;">Principal (Sign. with official seal)</td>
+                                  </tr>
+                                </table>
                                 <div>
                                   <h4 class="text-bold">Disclaimer:</h4>
                                   <p>This is your online admit card, issued in accordance with our institution's
@@ -203,6 +228,95 @@
                                     and conditions outlined in this document.</p>
 
                                 </div>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </ng-container>
+
+                      <ng-container *ngIf="selectedStream && selectedValue==1">
+                        <ng-container *ngFor="let student of allAdmitCardsByStream,let i = index;">
+                          <p>{{i+1}}.</p>
+                          <div id="student-{{student.studentId}}">
+                            <div class="col-lg-10 offset-lg-1 custom-container">
+                              <div class="table-container">
+                                <div class="row">
+                                  <div class="col-2">
+                                    <img class="logo" src="../../../../assets/logo.png" alt="">
+                                  </div>
+                                  <div class="col-10" style="text-align: center;">
+                                    <div class="school-name"> 
+                                      <h3 class="text-bold">{{schoolInfo?.schoolName | uppercase}}, {{schoolInfo?.city | uppercase}}</h3>
+                                     </div>
+                                    <div class="address" style="text-align: center;">
+                                      <p>( {{schoolInfo?.board}} Affiliation No.- {{schoolInfo?.affiliationNumber}},
+                                        School Code - {{schoolInfo?.schoolCode}} )
+                                      </p>
+                                      <p><span>{{schoolInfo?.street}},{{schoolInfo?.city}},District-
+                                          {{schoolInfo?.district}},
+                                          {{schoolInfo?.state}}</span></p>
+                                      <p><span>Website - {{baseURL}}</span></p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-12" class="title-lable">
+                                    <p>{{student?.examType | uppercase}} EXAM ADMIT CARD {{student?.session}}</p>
+                                  </div>
+                                </div>
+                                <table class="info-table">
+                                  <tr>
+                                    <th>Admission No. :</th>
+                                    <td>{{student?.admissionNo}}</td>
+                                    <td class="text-bold">Roll Number :</td>
+                                    <td>{{student?.rollNumber}}</td>
+                                    <td class="text-bold">Class :</td>
+                                    <td>{{student?.class | classSuffix}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="text-bold">Student Name :</td>
+                                    <td>{{student?.name | titlecase}}</td>
+                                    <td class="text-bold">Father Name :</td>
+                                    <td>{{student?.fatherName | titlecase}}</td>
+                                    <td class="text-bold">Mother Name :</td>
+                                    <td>{{student?.motherName | titlecase}}</td>
+                                  </tr>
+                                </table>
+                                <table class="custom-table">
+                                  <tr>
+                                    <th>S.No.</th>
+                                    <th>Subject</th>
+                                    <th>Exam Date</th>
+                                    <th>Exam Timing</th>
+                                  </tr>
+                                  <ng-container *ngIf="processedData && processedData.length > 0">
+                                    <tr *ngFor="let exam of processedData; let i = index">
+                                      <td>
+                                        {{ i + 1 }}
+                                      </td>
+                                      <td>
+                                        {{ exam.subject | titlecase}}
+                                      </td>
+                                      <td>
+                                        {{ exam.date }}
+                                      </td>
+                                      <td>
+                                        {{ exam.timing }}
+                                      </td>
+                                    </tr>
+                                  </ng-container>
+                                </table>
+                                <table class="custom-table" style="border: none;margin-top: 20px;">
+                                  <tr>
+                                    <td class="text-bold"
+                                      style="width:50%;padding-left:10%;text-align: left;border: none;">Class Teacher
+                                      (Signature)</td>
+                                    <td class="text-bold"
+                                      style="width:50%;padding-right:10%;text-align: right;border: none;">Principal
+                                      (Sign. with official seal)</td>
+                                  </tr>
+                                </table>
+                                 <div class="row" style="padding-top: 45px;margin-bottom: 30px;border-bottom:1px dashed #2e2d6a"></div>
                               </div>
                             </div>
                           </div>
