@@ -104,7 +104,7 @@
             <th>Total Marks</th>
             <th>Grade</th>
           </tr>
-          <tr *ngFor="let exam of examResultInfo.marks; let i = index">
+          <tr *ngFor="let exam of examResultInfo.resultDetail.marks; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ exam.subject | titlecase }}</td>
             <td>{{ exam.theoryMarks }}</td>
@@ -117,17 +117,17 @@
         <table class="custom-table">
           <tr>
             <td>
-              <span class="text-bold">Result Status</span> : {{examResultInfo.resultStatus}}
+              <span class="text-bold">Result Status</span> : {{examResultInfo.resultDetail.resultStatus}}
             </td>
             <td>
               <span class="text-bold">Grand Total (Theory + Practical/Internal Marks)</span> : {{
-              examResultInfo?.grandTotalMarks }}/{{ examResultInfo?.totalMaxMarks}}
+                examResultInfo.resultDetail.grandTotalMarks }}/{{ examResultInfo.resultDetail.totalMaxMarks}}
             </td>
             <td>
-              <span class="text-bold">Percentage</span> : {{examResultInfo?.percentile}}%
+              <span class="text-bold">Percentage</span> : {{examResultInfo.resultDetail.percentile}}%
             </td>
             <td>
-              <span class="text-bold">Overall Grade</span> : {{examResultInfo?.percentileGrade}}
+              <span class="text-bold">Overall Grade</span> : {{examResultInfo.resultDetail.percentileGrade}}
             </td>
 
           </tr>

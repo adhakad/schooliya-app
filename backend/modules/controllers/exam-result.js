@@ -37,7 +37,7 @@ let GetSingleStudentExamResult = async (req, res, next) => {
         if (resultPublishStatus == false) {
             return res.status(404).json({ errorMsg: 'Your exam result will be declared soon !' });
         }
-        return res.status(200).json({ examResultStructure: examResultStructure, examResult: examResult, studentInfo: student });
+        return res.status(200).json({ examResult: examResult, studentInfo: student });
     } catch (error) {
         return res.status(500).json({ errorMsg: 'Internal Server Error !' });
     }
