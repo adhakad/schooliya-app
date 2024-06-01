@@ -26,8 +26,7 @@ const ExamResultModel = mongoose.model('exam-result', {
     required: true,
     trim: true,
   },
-  theoryMarks: {},
-  practicalMarks: {},
+  resultDetail:{},
   createdBy: {
     type: String,
     required: true,

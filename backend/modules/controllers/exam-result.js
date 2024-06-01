@@ -55,16 +55,16 @@ let GetSingleStudentExamResultById = async (req, res, next) => {
         if (stream === "stream") {
             stream = "N/A";
         }
-        let examResultStr = await ExamResultStructureModel.findOne({adminId:adminId, class: className, stream: stream });
+        let examResultStr = await ExamResultStructureModel.findOne({ adminId: adminId, class: className, stream: stream });
         if (!examResultStr) {
             return res.status(404).json({ errorMsg: 'This class any exam not found !' });
         }
-        let examResult = await ExamResultModel.findOne({adminId:adminId, studentId: studentId });
+        let examResult = await ExamResultModel.findOne({ adminId: adminId, studentId: studentId });
         if (!examResult) {
             return res.status(404).json({ errorMsg: 'Exam result not found !' });
         }
         let examType = examResult.examType;
-        let examResultStructure = await ExamResultStructureModel.findOne({adminId:adminId, class: className, examType: examType });
+        let examResultStructure = await ExamResultStructureModel.findOne({ adminId: adminId, class: className, examType: examType });
         if (!examResultStructure) {
             return res.status(404).json({ errorMsg: 'This class any exam not found !' });
         }
@@ -127,8 +127,8 @@ let GetAllStudentExamResultByClass = async (req, res, next) => {
 
 let CreateExamResult = async (req, res, next) => {
     let className = req.body.class;
-    let { adminId, rollNumber, examType, stream, createdBy } = req.body;
-    let { theoryMarks, practicalMarks } = req.body.type;
+    let { adminId, rollNumber, examType, stream,resultDetail, createdBy } = req.body;
+    // let { theoryMarks, practicalMarks } = req.body.type;
     if (stream === "stream") {
         stream = "N/A";
     }
@@ -152,12 +152,12 @@ let CreateExamResult = async (req, res, next) => {
             examType: examType,
             stream: stream,
             class: className,
-            theoryMarks: theoryMarks,
+            resultDetail:resultDetail,
             createdBy: createdBy,
         }
-        if (practicalMarks) {
-            examResultData.practicalMarks = practicalMarks;
-        }
+        // if (practicalMarks) {
+        //     examResultData.practicalMarks = practicalMarks;
+        // }
         let createExamResult = await ExamResultModel.create(examResultData);
         return res.status(200).json('Student exam result add successfully.');
     } catch (error) {
@@ -165,100 +165,100 @@ let CreateExamResult = async (req, res, next) => {
     }
 }
 
-let CreateBulkExamResult = async (req, res, next) => {
-    let { examType, stream, createdBy } = req.body;
-    let className = req.body.bulkResult[0].Class
-    if (stream === "stream") {
-        stream = "N/A";
-    }
-    let result = [];
-    let newClsRollNumber = [];
-    result = req.body.bulkResult.map(entry => {
-        const rollNumber = entry['Roll Number'];
-        newClsRollNumber.push(rollNumber);
-        const studentClass = entry.Class;
-        const theoryMarks = [];
-        const practicalMarks = [];
-        for (const subject in entry) {
-            if (subject !== 'Roll Number' && subject !== 'Class') {
-                const marks = entry[subject];
-                const modifiedSubject = subject.replace(' Practical', '');
-                const marksEntry = { [modifiedSubject]: marks };
+// let CreateBulkExamResult = async (req, res, next) => {
+//     let { examType, stream, createdBy } = req.body;
+//     let className = req.body.bulkResult[0].Class
+//     if (stream === "stream") {
+//         stream = "N/A";
+//     }
+//     let result = [];
+//     let newClsRollNumber = [];
+//     result = req.body.bulkResult.map(entry => {
+//         const rollNumber = entry['Roll Number'];
+//         newClsRollNumber.push(rollNumber);
+//         const studentClass = entry.Class;
+//         const theoryMarks = [];
+//         const practicalMarks = [];
+//         for (const subject in entry) {
+//             if (subject !== 'Roll Number' && subject !== 'Class') {
+//                 const marks = entry[subject];
+//                 const modifiedSubject = subject.replace(' Practical', '');
+//                 const marksEntry = { [modifiedSubject]: marks };
 
-                if (subject.includes('Practical')) {
-                    practicalMarks.push(marksEntry);
-                } else {
-                    theoryMarks.push(marksEntry);
-                }
-            }
-        }
-        const resultEntry = {
-            examType: examType,
-            stream: stream,
-            class: studentClass,
-            theoryMarks: theoryMarks,
-            createdBy: createdBy,
-        };
-        if (practicalMarks.length > 0) {
-            resultEntry.practicalMarks = practicalMarks;
-        }
-        return resultEntry;
-    });
+//                 if (subject.includes('Practical')) {
+//                     practicalMarks.push(marksEntry);
+//                 } else {
+//                     theoryMarks.push(marksEntry);
+//                 }
+//             }
+//         }
+//         const resultEntry = {
+//             examType: examType,
+//             stream: stream,
+//             class: studentClass,
+//             theoryMarks: theoryMarks,
+//             createdBy: createdBy,
+//         };
+//         if (practicalMarks.length > 0) {
+//             resultEntry.practicalMarks = practicalMarks;
+//         }
+//         return resultEntry;
+//     });
 
-    try {
-        const students = await StudentModel.find({ 'rollNumber': { $in: newClsRollNumber }, class: className }, '_id rollNumber');
-        if (students.length == 0) {
-            return res.status(404).json(`All roll number invalid !`);
-        }
-        if (newClsRollNumber.length > students.length) {
-            let studentRollNumber = [];
-            for (let i = 0; i < students.length; i++) {
-                studentRollNumber.push(students[i].rollNumber);
-            }
-            let invalidRollNumber = newClsRollNumber.filter((rollNumber1) => studentRollNumber.some((rollNumber2) => rollNumber1 !== rollNumber2))
-            let spreadRollNumber = invalidRollNumber.join(' ,');
-            return res.status(404).json(`Roll number ${spreadRollNumber} is invalid !`);
-        }
-        let newClsStudentId = [];
-        for (let i = 0; i < result.length; i++) {
-            let objId = students[i]._id.toString();
-            newClsStudentId.push(objId);
-            result[i].studentId = objId;
-        }
-        let existingItems = await ExamResultModel.find({ class: className }).lean();
-        let existingClsStudentId = existingItems.map(item => item.studentId);
-        let existStudentId = existingClsStudentId.filter((studentId1) => newClsStudentId.some((studentId2) => studentId1 === studentId2))
-        if (existStudentId.length > 0) {
-            const student = await StudentModel.find({
-                '_id': { $in: existStudentId },
-                class: className
-            }, 'rollNumber');
-            let existRollNumber = [];
-            for (let i = 0; i < student.length; i++) {
-                existRollNumber.push(student[i].rollNumber);
-            }
-            if (existRollNumber.length > 0) {
-                let spreadRollNumber = existRollNumber.join(' ,');
-                return res.status(400).json(`Roll number  ${spreadRollNumber} result already exist !`);
-            }
+//     try {
+//         const students = await StudentModel.find({ 'rollNumber': { $in: newClsRollNumber }, class: className }, '_id rollNumber');
+//         if (students.length == 0) {
+//             return res.status(404).json(`All roll number invalid !`);
+//         }
+//         if (newClsRollNumber.length > students.length) {
+//             let studentRollNumber = [];
+//             for (let i = 0; i < students.length; i++) {
+//                 studentRollNumber.push(students[i].rollNumber);
+//             }
+//             let invalidRollNumber = newClsRollNumber.filter((rollNumber1) => studentRollNumber.some((rollNumber2) => rollNumber1 !== rollNumber2))
+//             let spreadRollNumber = invalidRollNumber.join(' ,');
+//             return res.status(404).json(`Roll number ${spreadRollNumber} is invalid !`);
+//         }
+//         let newClsStudentId = [];
+//         for (let i = 0; i < result.length; i++) {
+//             let objId = students[i]._id.toString();
+//             newClsStudentId.push(objId);
+//             result[i].studentId = objId;
+//         }
+//         let existingItems = await ExamResultModel.find({ class: className }).lean();
+//         let existingClsStudentId = existingItems.map(item => item.studentId);
+//         let existStudentId = existingClsStudentId.filter((studentId1) => newClsStudentId.some((studentId2) => studentId1 === studentId2))
+//         if (existStudentId.length > 0) {
+//             const student = await StudentModel.find({
+//                 '_id': { $in: existStudentId },
+//                 class: className
+//             }, 'rollNumber');
+//             let existRollNumber = [];
+//             for (let i = 0; i < student.length; i++) {
+//                 existRollNumber.push(student[i].rollNumber);
+//             }
+//             if (existRollNumber.length > 0) {
+//                 let spreadRollNumber = existRollNumber.join(' ,');
+//                 return res.status(400).json(`Roll number  ${spreadRollNumber} result already exist !`);
+//             }
 
-        }
-        const checkResultStr = await ExamResultStructureModel.findOne({ class: className, examType: examType, stream: stream });
-        if (!checkResultStr) {
-            return res.status(404).json(`${examType} exam not found !`);
-        }
-        let createExamResult = await ExamResultModel.create(result);
-        return res.status(200).json('Student exam result add successfully.');
+//         }
+//         const checkResultStr = await ExamResultStructureModel.findOne({ class: className, examType: examType, stream: stream });
+//         if (!checkResultStr) {
+//             return res.status(404).json(`${examType} exam not found !`);
+//         }
+//         let createExamResult = await ExamResultModel.create(result);
+//         return res.status(200).json('Student exam result add successfully.');
 
-    } catch (error) {
-        return res.status(500).json('Internal Server Error !');
-    }
-}
+//     } catch (error) {
+//         return res.status(500).json('Internal Server Error !');
+//     }
+// }
 
 module.exports = {
     GetSingleStudentExamResult,
     GetSingleStudentExamResultById,
     GetAllStudentExamResultByClass,
     CreateExamResult,
-    CreateBulkExamResult
+    // CreateBulkExamResult,
 }

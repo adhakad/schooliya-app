@@ -89,7 +89,7 @@ let GetAllStudentAdmitCardByClass = async (req, res, next) => {
         }
         return res.status(200).json({ admitCardInfo: admitCardInfo, studentInfo: studentInfo });
     } catch (error) {
-        return res.status(500).json({ errorMsg: 'Internal Server Error !' });;
+        return res.status(500).json({ errorMsg: 'Internal Server Error !' });
     }
 }
 
