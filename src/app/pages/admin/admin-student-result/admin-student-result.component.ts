@@ -5,8 +5,10 @@ import { Subject } from 'rxjs';
 import { read, utils, writeFile } from 'xlsx';
 import { ExamResultService } from 'src/app/services/exam-result.service';
 import { MatRadioChange } from '@angular/material/radio';
+import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
 import { ExamResultStructureService } from 'src/app/services/exam-result-structure.service';
+import { SchoolService } from 'src/app/services/school.service';
 
 @Component({
   selector: 'app-admin-student-result',
@@ -16,6 +18,7 @@ import { ExamResultStructureService } from 'src/app/services/exam-result-structu
 export class AdminStudentResultComponent implements OnInit {
   examResultForm: FormGroup;
   showModal: boolean = false;
+  showBulkResultPrintModal: boolean = false;
   showBulkImportModal: boolean = false;
   updateMode: boolean = false;
   deleteMode: boolean = false;
@@ -23,9 +26,11 @@ export class AdminStudentResultComponent implements OnInit {
   successMsg: String = '';
   errorMsg: String = '';
   errorCheck: Boolean = false;
+  schoolInfo: any;
   resultStructureInfo: any;
   allExamResults: any[] = [];
   examResultInfo: any[] = [];
+  mappedResults: any[] = [];
   studentInfo: any;
   recordLimit: number = 10;
   filters: any = {};
@@ -46,14 +51,14 @@ export class AdminStudentResultComponent implements OnInit {
   streamMainSubject: any[] = ['Mathematics(Science)', 'Biology(Science)', 'History(Arts)', 'Sociology(Arts)', 'Political Science(Arts)', 'Accountancy(Commerce)', 'Economics(Commerce)', 'Agriculture', 'Home Science'];
   loader: Boolean = true;
   adminId!: string;
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private adminAuthService: AdminAuthService, private examResultService: ExamResultService, private examResultStructureService: ExamResultStructureService) {
+  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private adminAuthService: AdminAuthService,private schoolService: SchoolService,private printPdfService: PrintPdfService, private examResultService: ExamResultService, private examResultStructureService: ExamResultStructureService) {
     this.examResultForm = this.fb.group({
       adminId: [''],
       rollNumber: ['324567300', Validators.required],
       examType: [''],
       stream: [''],
       createdBy: [''],
-      resultDetail:[''],
+      resultDetail: [''],
       type: this.fb.group({
         theoryMarks: this.fb.array([]),
         practicalMarks: this.fb.array([]),
@@ -67,9 +72,19 @@ export class AdminStudentResultComponent implements OnInit {
     this.adminId = getAdmin?.id;
     this.cls = this.activatedRoute.snapshot.paramMap.get('id');
     this.getStudentExamResultByClass(this.cls);
+    this.getSchool();
   }
 
-
+  // onChange(event: MatRadioChange) {
+  //   this.selectedValue = event.value;
+  // }
+  getSchool() {
+    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
+      if (res) {
+        this.schoolInfo = res;
+      }
+    })
+  }
   addExamResultModel() {
     this.showModal = true;
     this.deleteMode = false;
@@ -116,10 +131,8 @@ export class AdminStudentResultComponent implements OnInit {
     this.stream = '';
     this.examResultForm.reset();
     this.showModal = false;
+    this.showBulkResultPrintModal = false;
     this.showBulkImportModal = false;
-  }
-  onChange(event: MatRadioChange) {
-    this.selectedValue = event.value;
   }
 
   successDone() {
@@ -128,6 +141,10 @@ export class AdminStudentResultComponent implements OnInit {
       this.successMsg = '';
       this.getStudentExamResultByClass(this.cls);
     }, 1000)
+  }
+
+  bulkPrint() {
+    this.showBulkResultPrintModal = true;
   }
 
   getStudentExamResultByClass(cls: any) {
@@ -139,32 +156,35 @@ export class AdminStudentResultComponent implements OnInit {
       if (res) {
         this.examResultInfo = res.examResultInfo;
         this.studentInfo = res.studentInfo;
-        const studentInfoMap = new Map();
-        this.studentInfo.forEach((item: any) => {
-          studentInfoMap.set(item._id, item);
-        });
+        const mapExamResultsToStudents = (examResults: any, studentInfo: any) => {
+          const studentInfoMap = studentInfo.reduce((acc: any, student: any) => {
+            acc[student._id] = student;
+            return acc;
+          }, {});
 
-        const combinedData = this.examResultInfo.reduce((result: any, examResult: any) => {
-          const studentInfo = studentInfoMap.get(examResult.studentId);
+          return examResults.map((result: any) => {
+            const student = studentInfoMap[result.studentId];
+            return {
+              session: student.session,
+              adminId: result.adminId,
+              studentId: result.studentId,
+              class: result.class,
+              examType: result.examType,
+              stream: result.stream,
+              createdBy: result.createdBy,
+              resultDetail: result.resultDetail,
+              status: result.status || "",
+              name: student.name,
+              fatherName: student.fatherName,
+              motherName: student.motherName,
+              rollNumber: student.rollNumber,
+              admissionNo: student.admissionNo
+            };
+          });
+        };
 
-          if (studentInfo) {
-            result.push({
-              studentId: examResult.studentId,
-              class: examResult.class,
-              examType: examResult.examType,
-              stream: examResult.stream,
-              createdBy: examResult.createdBy,
-              status: examResult.status || "",
-              name: studentInfo.name,
-              rollNumber: studentInfo.rollNumber,
-              admissionNo: studentInfo.admissionNo
-            });
-          }
-
-          return result;
-        }, []);
-        if (combinedData) {
-          this.allExamResults = combinedData;
+        this.mappedResults = mapExamResultsToStudents(this.examResultInfo, this.studentInfo);
+        if (this.mappedResults) {
           setTimeout(() => {
             this.loader = false;
           }, 1000);
@@ -172,7 +192,71 @@ export class AdminStudentResultComponent implements OnInit {
       }
     })
   }
+  printStudentData() {
+    const printContent = this.getPrintOneAdmitCardContent();
+    this.printPdfService.printContent(printContent);
+    this.closeModal();
+  }
 
+  private getPrintOneAdmitCardContent(): string {
+    let schoolName = this.schoolInfo.schoolName;
+    let city = this.schoolInfo.city;
+    let printHtml = '<html>';
+    printHtml += '<head>';
+    printHtml += '<style>';
+    printHtml += 'body { margin: 0; padding: 0; }';
+    printHtml += 'div { margin: 0; padding: 0;}';
+    printHtml += '.custom-container {font-family: Arial, sans-serif;overflow: auto;}';
+    printHtml += '.table-container {background-color: #fff;border: none;}';
+    printHtml += '.logo { height: 75px;margin-right:10px; }';
+    printHtml += '.school-name {display: flex; align-items: center; justify-content: center; text-align: center; }';
+    printHtml += '.school-name h3 { color: #2e2d6a !important; font-size: 18px !important;margin-top:-120px !important; margin-bottom: 0 !important; }';
+    printHtml += '.address{margin-top: -45px;}';
+    printHtml += '.address p{margin-top: -10px !important;}';
+
+    printHtml += '.info-table {width:100%;color: #2e2d6a !important;border: none;font-size: 12px;letter-spacing: .25px;margin-top: 1.5vh;margin-bottom: 2vh;display: inline-table;}';
+    printHtml += '.table-container .info-table th, .table-container .info-table td{color: #2e2d6a !important;text-align:center}';
+    printHtml += '.title-lable {max-height: 45px;text-align: center;margin-bottom: 15px;border:1px solid #2e2d6a;border-radius: 5px;margin-top: 25px;}';
+    printHtml += '.title-lable p {color: #2e2d6a !important;font-size: 15px;font-weight: 500;letter-spacing: 1px;}';
+    printHtml += '.codes .school-code  {margin-right:65%;}';
+    printHtml += '.custom-table {width: 100%;color: #2e2d6a !important;border-collapse:collapse;font-size: 12px;letter-spacing: .25px;margin-bottom: 20px;display: inline-table;border-radius:5px}';
+    printHtml += '.custom-table th{height:38px;text-align: center;border:1px solid #2e2d6a;}';
+    printHtml += '.custom-table tr{height:38px;}';
+    printHtml += '.custom-table td {text-align: center;border:1px solid #2e2d6a;}';
+    printHtml += '.text-bold { font-weight: bold;}';
+    printHtml += 'p {color: #2e2d6a !important;font-size:12px;}'
+    printHtml += 'h4 {color: #2e2d6a !important;}'
+    printHtml += '@media print {';
+    printHtml += '  body::before {';
+    printHtml += `    content: "${schoolName}, ${city}";`;
+    printHtml += '    position: fixed;';
+    printHtml += '    top: 40%;';
+    printHtml += '    left:10%;';
+    printHtml += '    font-size: 20px;';
+    printHtml += '    font-weight: bold;';
+    printHtml += '    font-family: Arial, sans-serif;';
+    printHtml += '    color: rgba(0, 0, 0, 0.08);';
+    printHtml += '    pointer-events: none;';
+    printHtml += '  }';
+    printHtml += '}';
+    printHtml += '</style>';
+    printHtml += '</head>';
+    printHtml += '<body>';
+
+    this.mappedResults.forEach((student, index) => {
+      const studentElement = document.getElementById(`student-${student.studentId}`);
+      if (studentElement) {
+        printHtml += studentElement.outerHTML;
+
+        // Add a page break after each student except the last one
+        if (index < this.mappedResults.length - 1) {
+          printHtml += '<div style="page-break-after: always;"></div>';
+        }
+      }
+    });
+    printHtml += '</body></html>';
+    return printHtml;
+  }
 
   selectExam(selectedExam: string) {
     if (this.classSubject || this.practicalSubjects) {
@@ -316,22 +400,22 @@ export class AdminStudentResultComponent implements OnInit {
       });
     };
     const marks = calculateGrades(examResult.theoryMarks, !!examResult.practicalMarks);
-        const grandTotalMarks = marks.reduce((total: number, item: any) => total + item.totalMarks, 0);
-        const percentile = parseFloat(((grandTotalMarks / totalMaxMarks) * 100).toFixed(2));
-        const basePercentile = parseFloat(percentile.toFixed(0));
-        const percentileGrade = this.resultStructureInfo.gradeMaxMarks.reduce((grade: string, gradeRange: any, i: number) => {
-          const maxMarks = parseFloat(String(Object.values(gradeRange)[0]));
-          const minMarks = parseFloat(String(Object.values(this.resultStructureInfo.gradeMinMarks[i])[0]));
-          return basePercentile >= minMarks && basePercentile <= maxMarks ? Object.keys(gradeRange)[0] : grade;
-        }, '');
-        let examResultInfo = {
-          marks: marks,
-          grandTotalMarks: grandTotalMarks,
-          totalMaxMarks: totalMaxMarks,
-          percentile: percentile,
-          percentileGrade: percentileGrade,
-          resultStatus: resultStatus
-        };
+    const grandTotalMarks = marks.reduce((total: number, item: any) => total + item.totalMarks, 0);
+    const percentile = parseFloat(((grandTotalMarks / totalMaxMarks) * 100).toFixed(2));
+    const basePercentile = parseFloat(percentile.toFixed(0));
+    const percentileGrade = this.resultStructureInfo.gradeMaxMarks.reduce((grade: string, gradeRange: any, i: number) => {
+      const maxMarks = parseFloat(String(Object.values(gradeRange)[0]));
+      const minMarks = parseFloat(String(Object.values(this.resultStructureInfo.gradeMinMarks[i])[0]));
+      return basePercentile >= minMarks && basePercentile <= maxMarks ? Object.keys(gradeRange)[0] : grade;
+    }, '');
+    let examResultInfo = {
+      marks: marks,
+      grandTotalMarks: grandTotalMarks,
+      totalMaxMarks: totalMaxMarks,
+      percentile: percentile,
+      percentileGrade: percentileGrade,
+      resultStatus: resultStatus
+    };
     if (this.examResultForm.valid) {
       this.examResultForm.value.resultDetail = examResultInfo;
       this.examResultForm.value.adminId = this.adminId;
