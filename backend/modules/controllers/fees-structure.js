@@ -22,15 +22,15 @@ let CreateFeesStructure = async (req, res, next) => {
     let className = req.body.class;
     let {adminId, admissionFees, totalFees } = req.body;
     let feesType = req.body.type.feesType;
-    let feesPayType = req.body.type.feesPayType;
+    // let feesPayType = req.body.type.feesPayType;
     let feesTypeTotal = feesType.reduce((total, obj) => {
         let value = Object.values(obj)[0];
         return total + value;
     }, 0);
-    let feesPayTypeTotal = feesPayType.reduce((total, obj) => {
-        let value = Object.values(obj)[0];
-        return total + value;
-    }, 0);
+    // let feesPayTypeTotal = feesPayType.reduce((total, obj) => {
+    //     let value = Object.values(obj)[0];
+    //     return total + value;
+    // }, 0);
 
     try {
         const checkClassExist = await ClassModel.findOne({ class: className });
@@ -44,33 +44,31 @@ let CreateFeesStructure = async (req, res, next) => {
         if (totalFees !== feesTypeTotal) {
             return res.status(400).json(`Class ${className} total fees is not equal to all fees particulars total !`);
         }
-        if (totalFees !== feesPayTypeTotal) {
-            return res.status(400).json(`Class ${className} total fees is not equal to all fees installment total !`);
-        }
+        // if (totalFees !== feesPayTypeTotal) {
+        //     return res.status(400).json(`Class ${className} total fees is not equal to all fees installment total !`);
+        // }
         let feesStructureData = {
             adminId:adminId,
             class: className,
             admissionFees: admissionFees,
             totalFees: totalFees,
             feesType: feesType,
-            installment: feesPayType,
         }
         let feesStructure = await FeesStructureModel.create(feesStructureData);
         if (feesStructure) {
-            let installment = feesStructure.installment;
-            installment.forEach((item) => {
-                Object.keys(item).forEach((key) => {
-                    item[key] = 0;
-                });
-            });
+            // let installment = feesStructure.installment;
+            // installment.forEach((item) => {
+            //     Object.keys(item).forEach((key) => {
+            //         item[key] = 0;
+            //     });
+            // });
             let admissionFees = feesStructure.admissionFees;
-            let totalFees = feesStructure.totalFees;
             let checkStudent = await StudentModel.find({adminId:adminId, class: className });
             if (checkStudent) {
                 let studentFeesData = [];
                 for (let i = 0; i < checkStudent.length; i++) {
                     let student = checkStudent[i];
-
+                    let totalFees = feesStructure.totalFees - student.discountAmountInFees;
                     let feesObject = {
                         studentId: student._id,
                         class: student.class,
@@ -79,9 +77,9 @@ let CreateFeesStructure = async (req, res, next) => {
                         totalFees: totalFees,
                         paidFees: 0,
                         dueFees: totalFees,
-                        receipt: installment,
-                        installment: installment,
-                        paymentDate: installment,
+                        // receipt: installment,
+                        // installment: installment,
+                        // paymentDate: installment,
                     };
 
                     if (student.admissionType === 'New') {

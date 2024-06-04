@@ -22,7 +22,6 @@ const FeesModel = mongoose.model('fees-structure', {
     trim: true,
   },
   feesType: {},
-  installment: {}
 
 });
 

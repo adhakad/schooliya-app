@@ -39,6 +39,11 @@ const FeesCollectionModel = mongoose.model('fees-collection', {
     trim: true,
     default: 'empty'
   },
+  discountAmountInFees:{
+    type: Number,
+    required: true,
+    trim: true,
+  },
   totalFees: {
     type: Number,
     required: true,

@@ -1,7 +1,6 @@
 'use strict';
 const StudentModel = require('../models/student');
 const StudentUserModel = require('../models/users/student-user');
-const AdmissionEnquiryModel = require('../models/admission-enquiry');
 const FeesStructureModel = require('../models/fees-structure');
 const FeesCollectionModel = require('../models/fees-collection');
 const AdmitCardModel = require('../models/admit-card');
@@ -26,11 +25,11 @@ let GetStudentPaginationByAdmission = async (req, res, next) => {
     try {
         let limit = (req.body.limit) ? parseInt(req.body.limit) : 10;
         let page = req.body.page || 1;
-        const studentList = await StudentModel.find({adminId:adminId, admissionType: 'New' }).find(searchObj).sort({ _id: -1 })
+        const studentList = await StudentModel.find({ adminId: adminId, admissionType: 'New' }).find(searchObj).sort({ _id: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .exec();
-        const countStudent = await StudentModel.count({adminId:adminId, admissionType: 'New' });
+        const countStudent = await StudentModel.count({ adminId: adminId, admissionType: 'New' });
         let studentData = { countStudent: 0 };
         studentData.studentList = studentList;
         studentData.countStudent = countStudent;
@@ -64,32 +63,32 @@ let GetStudentPaginationByAdmissionAndClass = async (req, res, next) => {
     }
 }
 
-let GetStudentAdmissionEnquiryPagination = async (req, res, next) => {
-    let searchText = req.body.filters.searchText;
-    let searchObj = {};
-    if (searchText) {
-        searchObj = /^(?:\d*\.\d{1,2}|\d+)$/.test(searchText)
-            ? {
-                $or: [{ contact: searchText }],
-            }
-            : { name: new RegExp(`${searchText.toString().trim()}`, 'i') };
-    }
-    try {
-        let limit = (req.body.limit) ? parseInt(req.body.limit) : 10;
-        let page = req.body.page || 1;
-        const admissionEnquiryList = await AdmissionEnquiryModel.find(searchObj).sort({ _id: -1 })
-            .limit(limit * 1)
-            .skip((page - 1) * limit)
-            .exec();
-        const countAdmissionEnquiry = await AdmissionEnquiryModel.count();
-        let admissionEnquiryData = { countAdmissionEnquiry: 0 };
-        admissionEnquiryData.admissionEnquiryList = admissionEnquiryList;
-        admissionEnquiryData.countAdmissionEnquiry = countAdmissionEnquiry;
-        return res.json(admissionEnquiryData);
-    } catch (error) {
-        return res.status(500).json('Internal Server Error !');
-    }
-}
+// let GetStudentAdmissionEnquiryPagination = async (req, res, next) => {
+//     let searchText = req.body.filters.searchText;
+//     let searchObj = {};
+//     if (searchText) {
+//         searchObj = /^(?:\d*\.\d{1,2}|\d+)$/.test(searchText)
+//             ? {
+//                 $or: [{ contact: searchText }],
+//             }
+//             : { name: new RegExp(`${searchText.toString().trim()}`, 'i') };
+//     }
+//     try {
+//         let limit = (req.body.limit) ? parseInt(req.body.limit) : 10;
+//         let page = req.body.page || 1;
+//         const admissionEnquiryList = await AdmissionEnquiryModel.find(searchObj).sort({ _id: -1 })
+//             .limit(limit * 1)
+//             .skip((page - 1) * limit)
+//             .exec();
+//         const countAdmissionEnquiry = await AdmissionEnquiryModel.count();
+//         let admissionEnquiryData = { countAdmissionEnquiry: 0 };
+//         admissionEnquiryData.admissionEnquiryList = admissionEnquiryList;
+//         admissionEnquiryData.countAdmissionEnquiry = countAdmissionEnquiry;
+//         return res.json(admissionEnquiryData);
+//     } catch (error) {
+//         return res.status(500).json('Internal Server Error !');
+//     }
+// }
 
 let GetStudentPaginationByClass = async (req, res, next) => {
     const currentDateIst = DateTime.now().setZone('Asia/Kolkata');
@@ -130,7 +129,7 @@ let GetStudentPaginationByClass = async (req, res, next) => {
 
 let GetAllStudentByClass = async (req, res, next) => {
     try {
-        let singleStudent = await StudentModel.find({ adminId : req.params.id, class: req.params.class }, '-otp -status -__v').sort({ _id: -1 });
+        let singleStudent = await StudentModel.find({ adminId: req.params.id, class: req.params.class }, '-otp -status -__v').sort({ _id: -1 });
         return res.status(200).json(singleStudent);
     } catch (error) {
         return res.status(500).json('Internal Server Error !');
@@ -151,18 +150,8 @@ let CreateStudent = async (req, res, next) => {
     let receiptNo = Math.floor(Math.random() * 899999 + 100000);
     const currentDateIst = DateTime.now().setZone('Asia/Kolkata');
     const istDateTimeString = currentDateIst.toFormat('dd-MM-yyyy hh:mm:ss a');
-    let { adminId, name, rollNumber, admissionClass, aadharNumber, samagraId, session, admissionFees, admissionFeesPaymentType, admissionType, stream, admissionNo, dob, doa, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome, createdBy } = req.body;
+    let { adminId, name, rollNumber, admissionClass, aadharNumber, samagraId, session, admissionFees, admissionFeesPaymentType, admissionType, stream, admissionNo, dob, doa, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome, discountAmountInFees, createdBy } = req.body;
     let className = req.body.class;
-    let onlineAdmissionStatus = req.body.status;
-    let onlineAdmObjId = req.body._id;
-    let objectId;
-    if (onlineAdmObjId) {
-        objectId = onlineAdmObjId;
-    }
-    let status;
-    if (onlineAdmissionStatus === 'Complete') {
-        status = onlineAdmissionStatus;
-    }
     if (stream === "stream") {
         stream = "N/A";
     }
@@ -180,7 +169,7 @@ let CreateStudent = async (req, res, next) => {
         dob = DateTime.fromISO(dob).toFormat("dd-MM-yyyy");
     }
     const studentData = {
-        adminId, name, rollNumber, aadharNumber, samagraId, otp, session, admissionType, stream, admissionNo, class: className, admissionClass, dob: dob, doa: doa, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome, createdBy
+        adminId, name, rollNumber, aadharNumber, samagraId, otp, session, admissionType, stream, admissionNo, class: className, admissionClass, dob: dob, doa: doa, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome, discountAmountInFees, createdBy
     }
     try {
         const checkFeesStr = await FeesStructureModel.findOne({ adminId: adminId, class: className });
@@ -207,17 +196,12 @@ let CreateStudent = async (req, res, next) => {
         if (checkRollNumber) {
             return res.status(400).json(`Roll number already exist for this class !`);
         }
-        let totalFees = checkFeesStr.totalFees;
-        let installment = checkFeesStr.installment;
+        let totalFees = checkFeesStr.totalFees - discountAmountInFees;
         const admissionFee = checkFeesStr.admissionFees;
-        installment.forEach((item) => {
-            Object.keys(item).forEach((key) => {
-                item[key] = 0;
-            });
-        });
         let admissionFeesPayable = false;
         let paidFees = 0;
         let dueFees = totalFees - paidFees;
+
         if (admissionType == 'New' && admissionFeesPaymentType == 'Immediate') {
             admissionFeesPayable = true;
             admissionFees = admissionFees;
@@ -232,34 +216,29 @@ let CreateStudent = async (req, res, next) => {
             paidFees = admissionFees;
             dueFees = totalFees - admissionFees;
         }
-        const studentFeesData = {
+        let studentFeesData = {
             adminId: adminId,
-            class: className,
-            admissionFees: admissionFees,
+            class: parseInt(className),
+            admissionFees: admissionFees ? admissionFees : 0,
             admissionFeesPayable: admissionFeesPayable,
+            discountAmountInFees:discountAmountInFees,
             totalFees: totalFees,
             paidFees: paidFees,
             dueFees: dueFees,
-            receipt: installment,
-            installment: installment,
-            paymentDate: installment,
-            createdBy: installment
+            installment: {},
+            receipt: {},
+            paymentDate: {},
+            createdBy: {}
         }
         if (admissionType == 'New' && admissionFeesPaymentType == 'Immediate') {
-            studentFeesData.admissionFeesReceiptNo = receiptNo,
-                studentFeesData.admissionFeesPaymentDate = istDateTimeString
+            studentFeesData.admissionFeesReceiptNo = receiptNo;
+            studentFeesData.admissionFeesPaymentDate = istDateTimeString;
         }
         let createStudent = await StudentModel.create(studentData);
         if (createStudent) {
             let studentId = createStudent._id;
             studentFeesData.studentId = studentId;
             let createStudentFeesData = await FeesCollectionModel.create(studentFeesData);
-            if (status === 'Complete' && objectId !== null && objectId !== undefined) {
-                const admissionData = {
-                    status: status
-                }
-                const updateStatus = await AdmissionEnquiryModel.findByIdAndUpdate(objectId, { $set: admissionData }, { new: true });
-            }
             if (createStudentFeesData) {
                 let studentAdmissionData = {
                     adminId: adminId,
@@ -291,31 +270,31 @@ let CreateStudent = async (req, res, next) => {
     }
 }
 
-let CreateStudentAdmissionEnquiry = async (req, res, next) => {
-    const currentDateIst = DateTime.now().setZone('Asia/Kolkata');
-    const doae = currentDateIst.toFormat('dd-MM-yyyy');
-    let { name, session, stream, dob, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome } = req.body;
-    let className = req.body.class;
-    if (stream === "stream") {
-        stream = "N/A";
-    }
-    dob = DateTime.fromISO(dob).toFormat("dd-MM-yyyy");
-    const studentData = {
-        name, session, stream, class: className, dob: dob, doae: doae, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome
-    }
-    try {
-        const checkContact = await AdmissionEnquiryModel.findOne({ name: name, contact: contact });
-        if (checkContact) {
-            return res.status(400).json(`Name: ${name} phone ${contact} is already fill online admission form, please visit school and confirm your admission !`);
-        }
-        let createAdmissionEnquiryModel = await AdmissionEnquiryModel.create(studentData);
-        if (createAdmissionEnquiryModel) {
-            return res.status(200).json({ successMsg: 'Online admission form submited successfully.' });
-        }
-    } catch (error) {
-        return res.status(500).json('Internal Server Error !');
-    }
-}
+// let CreateStudentAdmissionEnquiry = async (req, res, next) => {
+//     const currentDateIst = DateTime.now().setZone('Asia/Kolkata');
+//     const doae = currentDateIst.toFormat('dd-MM-yyyy');
+//     let { name, session, stream, dob, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome } = req.body;
+//     let className = req.body.class;
+//     if (stream === "stream") {
+//         stream = "N/A";
+//     }
+//     dob = DateTime.fromISO(dob).toFormat("dd-MM-yyyy");
+//     const studentData = {
+//         name, session, stream, class: className, dob: dob, doae: doae, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome
+//     }
+//     try {
+//         const checkContact = await AdmissionEnquiryModel.findOne({ name: name, contact: contact });
+//         if (checkContact) {
+//             return res.status(400).json(`Name: ${name} phone ${contact} is already fill online admission form, please visit school and confirm your admission !`);
+//         }
+//         let createAdmissionEnquiryModel = await AdmissionEnquiryModel.create(studentData);
+//         if (createAdmissionEnquiryModel) {
+//             return res.status(200).json({ successMsg: 'Online admission form submited successfully.' });
+//         }
+//     } catch (error) {
+//         return res.status(500).json('Internal Server Error !');
+//     }
+// }
 
 let CreateBulkStudentRecord = async (req, res, next) => {
     let bulkStudentRecord = req.body.bulkStudentRecord;
@@ -348,7 +327,7 @@ let CreateBulkStudentRecord = async (req, res, next) => {
     for (const student of bulkStudentRecord) {
         let otp = Math.floor(Math.random() * 899999 + 100000);
         studentData.push({
-            adminId:adminId,
+            adminId: adminId,
             name: student.name,
             rollNumber: student.rollNumber,
             aadharNumber: student.aadharNumber,
@@ -435,7 +414,7 @@ let CreateBulkStudentRecord = async (req, res, next) => {
             return res.status(400).json(`Admission number(s) ${spreadAdmissionNo} already exist !`);
         }
 
-        const existingRecords = await StudentModel.find({adminId:adminId, class: className }).lean();
+        const existingRecords = await StudentModel.find({ adminId: adminId, class: className }).lean();
         const duplicateRollNumber = [];
         for (const student of studentData) {
             // Check duplicate students exist from dadabase
@@ -449,7 +428,7 @@ let CreateBulkStudentRecord = async (req, res, next) => {
             const spreadRollNumber = duplicateRollNumber.join(', ');
             return res.status(400).json(`Roll number(s) ${spreadRollNumber} already exist for this class !`);
         }
-        const checkFeesStr = await FeesStructureModel.findOne({adminId:adminId, class: className });
+        const checkFeesStr = await FeesStructureModel.findOne({ adminId: adminId, class: className });
         if (!checkFeesStr) {
             return res.status(404).json(`Please create fees structure for class ${className} !`);
         }
@@ -469,7 +448,7 @@ let CreateBulkStudentRecord = async (req, res, next) => {
         for (let i = 0; i < createStudent.length; i++) {
             let student = createStudent[i];
             let feesObject = {
-                adminId:adminId,
+                adminId: adminId,
                 studentId: student._id,
                 class: student.class,
                 admissionFeesPayable: false,
@@ -532,7 +511,7 @@ let UpdateStudent = async (req, res, next) => {
 let StudentClassPromote = async (req, res, next) => {
     try {
         const studentId = req.params.id;
-        let { adminId,session, rollNumber, stream } = req.body;
+        let { adminId, session, rollNumber, stream } = req.body;
         if (stream == "stream") {
             stream = "N/A";
         }
@@ -559,7 +538,7 @@ let StudentClassPromote = async (req, res, next) => {
         if (className == cls && className !== 202) {
             className = className + 1;
         }
-        const checkFeesStr = await FeesStructureModel.findOne({adminId:adminId, class: className });
+        const checkFeesStr = await FeesStructureModel.findOne({ adminId: adminId, class: className });
         if (!checkFeesStr) {
             return res.status(404).json({ errorMsg: 'Please create fees structure for this class', className: className });
         }
@@ -574,7 +553,7 @@ let StudentClassPromote = async (req, res, next) => {
             const totalFees = checkFeesStr.totalFees;
             const installment = checkFeesStr.installment.map(item => Object.fromEntries(Object.keys(item).map(key => [key, 0])));
             const studentFeesData = {
-                adminId:adminId,
+                adminId: adminId,
                 studentId,
                 class: className,
                 admissionFees: 0,
@@ -585,7 +564,7 @@ let StudentClassPromote = async (req, res, next) => {
                 receipt: installment,
                 installment: installment,
                 paymentDate: installment,
-                createdBy:installment,
+                createdBy: installment,
             };
             let createStudentFeesData = await FeesCollectionModel.create(studentFeesData);
             if (createStudentFeesData) {
@@ -633,30 +612,30 @@ let DeleteStudent = async (req, res, next) => {
         return res.status(500).json('Internal Server Error!');
     }
 }
-let DeleteAdmissionEnquiry = async (req, res, next) => {
-    try {
-        const id = req.params.id;
-        const admissionEnquiry = await AdmissionEnquiryModel.findByIdAndRemove(id);
-        return res.status(200).json('Student Online admission form delete successfully.');
-    } catch (error) {
-        return res.status(500).json('Internal Server Error!');
-    }
-}
+// let DeleteAdmissionEnquiry = async (req, res, next) => {
+//     try {
+//         const id = req.params.id;
+//         const admissionEnquiry = await AdmissionEnquiryModel.findByIdAndRemove(id);
+//         return res.status(200).json('Student Online admission form delete successfully.');
+//     } catch (error) {
+//         return res.status(500).json('Internal Server Error!');
+//     }
+// }
 
 module.exports = {
     countStudent,
     GetStudentPaginationByAdmission,
     GetStudentPaginationByAdmissionAndClass,
-    GetStudentAdmissionEnquiryPagination,
+    // GetStudentAdmissionEnquiryPagination,
     GetStudentPaginationByClass,
     GetAllStudentByClass,
     GetSingleStudent,
     CreateStudent,
-    CreateStudentAdmissionEnquiry,
+    // CreateStudentAdmissionEnquiry,
     CreateBulkStudentRecord,
     UpdateStudent,
     StudentClassPromote,
     ChangeStatus,
     DeleteStudent,
-    DeleteAdmissionEnquiry
+    // DeleteAdmissionEnquiry
 }

@@ -12,8 +12,8 @@ import { SchoolService } from 'src/app/services/school.service';
 })
 export class AdminStudentFeesStructureComponent implements OnInit {
   disabled = true;
-  installment: boolean = false;
-  monthly: boolean = false;
+  // installment: boolean = false;
+  // monthly: boolean = false;
 
 
   cls: any;
@@ -30,8 +30,8 @@ export class AdminStudentFeesStructureComponent implements OnInit {
   totalFees: number = 0;
 
   selectedFeesType: any[] = [];
-  selectedFeesPayType: any[] = [];
-  checkFeesPayType: boolean = false;
+  // selectedFeesPayType: any[] = [];
+  // checkFeesPayType: boolean = false;
   feesTypeMode: boolean = false;
   feesMode: boolean = false;
   clsFeesStructure: any;
@@ -46,7 +46,7 @@ export class AdminStudentFeesStructureComponent implements OnInit {
       admissionFees: ['', Validators.required],
       type: this.fb.group({
         feesType: this.fb.array([], [Validators.required]),
-        feesPayType: this.fb.array([], [Validators.required]),
+        // feesPayType: this.fb.array([], [Validators.required]),
       }),
     });
   }
@@ -83,20 +83,20 @@ export class AdminStudentFeesStructureComponent implements OnInit {
       this.errorMsg = err.error;
     })
   }
-  installmentPayment() {
-    this.checkFeesPayType = true;
-    this.monthly = false;
-    this.installment = true;
-    this.selectedFeesPayType = [];
-    this.selectedFeesPayType = ['First', 'Second', 'Third'];
-  }
-  monthlyPayment() {
-    this.checkFeesPayType = true;
-    this.installment = false;
-    this.monthly = true;
-    this.selectedFeesPayType = [];
-    this.selectedFeesPayType = ['July', 'August', 'September', 'October', 'November', 'December', 'January', 'Fabruary', 'March', 'April'];
-  }
+  // installmentPayment() {
+  //   this.checkFeesPayType = true;
+  //   this.monthly = false;
+  //   this.installment = true;
+  //   this.selectedFeesPayType = [];
+  //   this.selectedFeesPayType = ['First', 'Second', 'Third'];
+  // }
+  // monthlyPayment() {
+  //   this.checkFeesPayType = true;
+  //   this.installment = false;
+  //   this.monthly = true;
+  //   this.selectedFeesPayType = [];
+  //   this.selectedFeesPayType = ['July', 'August', 'September', 'October', 'November', 'December', 'January', 'Fabruary', 'March', 'April'];
+  // }
   addFeesModel() {
     this.showModal = true;
     this.feesTypeMode = true;
@@ -112,17 +112,17 @@ export class AdminStudentFeesStructureComponent implements OnInit {
   }
 
   falseAllValue() {
-    this.installment = false;
-    this.monthly = false;
+    // this.installment = false;
+    // this.monthly = false;
 
     this.totalFees = 0;
     this.selectedFeesType = [];
-    this.selectedFeesPayType = [];
+    // this.selectedFeesPayType = [];
     const controlOne = <FormArray>this.feesForm.get('type.feesType');
-    const controlSecond = <FormArray>this.feesForm.get('type.feesPayType');
+    // const controlSecond = <FormArray>this.feesForm.get('type.feesPayType');
     controlOne.clear();
-    controlSecond.clear();
-    this.checkFeesPayType = false;
+    // controlSecond.clear();
+    // this.checkFeesPayType = false;
     this.feesTypeMode = false;
     this.feesMode = false;
 
@@ -168,23 +168,11 @@ export class AdminStudentFeesStructureComponent implements OnInit {
       controlOne.push(this.patchFeesTypeValues(x))
       this.feesForm.reset();
     })
-
-    const controlSecond = <FormArray>this.feesForm.get('type.feesPayType');
-    this.selectedFeesPayType.forEach((x: any) => {
-      controlSecond.push(this.patchFeesPayTypeValues(x))
-      this.feesForm.reset();
-    })
-
   }
 
   patchFeesTypeValues(selectedFeesType: any) {
     return this.fb.group({
       [selectedFeesType]: [selectedFeesType]
-    })
-  }
-  patchFeesPayTypeValues(selectedFeesPayType: any) {
-    return this.fb.group({
-      [selectedFeesPayType]: [selectedFeesPayType]
     })
   }
 
@@ -193,14 +181,13 @@ export class AdminStudentFeesStructureComponent implements OnInit {
     this.feesForm.value.class = this.cls;
     this.feesForm.value.totalFees = this.totalFees;
     let feesTypeObj = this.feesForm.value.type.feesType;
-    let feesPayTypeObj = this.feesForm.value.type.feesPayType;
+  
     let containsFeesTypeNull = feesTypeObj.some((item: any) => Object.values(item).includes(null));
-    let containsFeesPayTypeNull = feesPayTypeObj.some((item: any) => Object.values(item).includes(null));
-    if (containsFeesTypeNull || containsFeesPayTypeNull) {
+    if (containsFeesTypeNull) {
       this.errorCheck = true;
       this.errorMsg = 'Please fill all fields';
     }
-    if (!containsFeesTypeNull && !containsFeesPayTypeNull) {
+    if (!containsFeesTypeNull) {
       this.feesStructureService.addFeesStructure(this.feesForm.value).subscribe((res: any) => {
         if (res) {
           this.successDone();

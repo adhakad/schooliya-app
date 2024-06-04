@@ -6,7 +6,7 @@ const StudentModel = mongoose.model('student', {
         type: String,
         required: true,
         trim: true
-      },
+    },
     session: {
         type: String,
         required: true,
@@ -22,7 +22,7 @@ const StudentModel = mongoose.model('student', {
         required: true,
         trim: true
     },
-    admissionClass:{
+    admissionClass: {
         type: Number,
         required: true,
         trim: true
@@ -31,13 +31,13 @@ const StudentModel = mongoose.model('student', {
         type: Number,
         required: true,
         trim: true,
-        unique:true,
+        unique: true,
     },
     rollNumber: {
         type: Number,
         required: true,
         trim: true,
-        unique:true,
+        unique: true,
     },
     admissionType: {
         type: String,
@@ -82,15 +82,15 @@ const StudentModel = mongoose.model('student', {
     aadharNumber: {
         type: Number,
         trim: true,
-        required:true,
-        unique:true,
+        required: true,
+        unique: true,
 
     },
     samagraId: {
         type: Number,
         trim: true,
-        required:true,
-        unique:true,
+        required: true,
+        unique: true,
 
     },
     contact: {
@@ -157,6 +157,11 @@ const StudentModel = mongoose.model('student', {
         required: true,
         trim: true
     },
+    discountAmountInFees: {
+        type: Number,
+        required: true,
+        trim: true,
+    },
     otp: {
         type: Number,
         required: true,
@@ -169,7 +174,7 @@ const StudentModel = mongoose.model('student', {
         enum: ['Active', 'Inactive'],
         default: 'Active'
     },
-    createdBy:{
+    createdBy: {
         type: String,
         required: true,
         trim: true,

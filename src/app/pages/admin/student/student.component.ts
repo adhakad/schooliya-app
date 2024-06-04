@@ -105,6 +105,7 @@ export class StudentComponent implements OnInit {
       motherOccupation: ['', Validators.required],
       motherContact: ['', [Validators.required, Validators.pattern('^[6789]\\d{9}$')]],
       motherAnnualIncome: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+      discountAmountInFees:[''],
       createdBy: [''],
     })
 
@@ -365,6 +366,7 @@ export class StudentComponent implements OnInit {
   studentAddUpdate() {
     if (this.studentForm.valid) {
       this.studentForm.value.adminId = this.adminId;
+      this.studentForm.value.discountAmountInFees = 500;
       if (this.updateMode) {
         this.studentService.updateStudent(this.studentForm.value).subscribe((res: any) => {
           if (res) {

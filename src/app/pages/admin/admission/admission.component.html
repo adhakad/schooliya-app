@@ -202,7 +202,7 @@
                             <div class="col-12 col-lg-6">
                               <mat-form-field appearance="outline">
                                 <mat-label>Admission No.</mat-label>
-                                <input matInput type="number" formControlName="admissionNo" readonly>
+                                <input matInput type="number" formControlName="admissionNo">
                                 <mat-error
                                   *ngIf="studentForm.get('admissionNo')?.hasError('required') && studentForm.get('admissionNo')?.touched">
                                   Admission no. is required
@@ -255,7 +255,7 @@
                             <div class="col-12 col-lg-6" *ngIf="rollNumberType=='generate'">
                               <mat-form-field appearance="outline">
                                 <mat-label>Roll Number</mat-label>
-                                <input matInput type="number" formControlName="rollNumber" readonly>
+                                <input matInput type="number" formControlName="rollNumber">
                                 <mat-error
                                   *ngIf="studentForm.get('rollNumber')?.hasError('required') && studentForm.get('rollNumber')?.touched">
                                   Roll number is required

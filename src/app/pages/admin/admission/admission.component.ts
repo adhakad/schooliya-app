@@ -18,7 +18,7 @@ export class AdmissionComponent implements OnInit {
   @ViewChild('receipt') receipt!: ElementRef;
   studentForm: FormGroup;
   showModal: boolean = false;
-  showAdmissionPrintModal:boolean = false;
+  showAdmissionPrintModal: boolean = false;
   updateMode: boolean = false;
   deleteMode: boolean = false;
   deleteById: String = '';
@@ -47,15 +47,15 @@ export class AdmissionComponent implements OnInit {
   clsFeesStructure: any;
   schoolInfo: any;
   admissionrReceiptInfo: any;
-  singleStudentInfo:any;
+  singleStudentInfo: any;
   receiptMode: boolean = false;
   baseURL!: string;
   loader: Boolean = true;
-  adminId!:String
-  constructor(private fb: FormBuilder,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private classService: ClassService, private studentService: StudentService, private feesStructureService: FeesStructureService) {
+  adminId!: String
+  constructor(private fb: FormBuilder, private adminAuthService: AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private classService: ClassService, private studentService: StudentService, private feesStructureService: FeesStructureService) {
     this.studentForm = this.fb.group({
       _id: [''],
-      adminId:[''],
+      adminId: [''],
       session: ['', Validators.required],
       admissionNo: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
       admissionFees: ['', Validators.required],
@@ -85,6 +85,7 @@ export class AdmissionComponent implements OnInit {
       motherOccupation: ['', Validators.required],
       motherContact: ['', [Validators.required, Validators.pattern('^[6789]\\d{9}$')]],
       motherAnnualIncome: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+      discountAmountInFees: [''],
       createdBy: [''],
 
     })
@@ -114,7 +115,7 @@ export class AdmissionComponent implements OnInit {
     this.printPdfService.printContent(printContent);
     this.closeModal();
   }
-  
+
   private getPrintContent(): string {
     let schoolName = this.schoolInfo.schoolName;
     let city = this.schoolInfo.city;
@@ -160,10 +161,10 @@ export class AdmissionComponent implements OnInit {
     printHtml += '</style>';
     printHtml += '</head>';
     printHtml += '<body>';
-      const studentElement = document.getElementById(`student`);
-      if (studentElement) {
-        printHtml += studentElement.outerHTML;
-      }
+    const studentElement = document.getElementById(`student`);
+    if (studentElement) {
+      printHtml += studentElement.outerHTML;
+    }
     printHtml += '</body></html>';
     return printHtml;
   }
@@ -175,7 +176,7 @@ export class AdmissionComponent implements OnInit {
       }
     })
   }
-  addPrintModal(student:any){
+  addPrintModal(student: any) {
     this.singleStudentInfo = student;
     this.showAdmissionPrintModal = true;
   }
@@ -201,8 +202,8 @@ export class AdmissionComponent implements OnInit {
   }
   feesStructureByClass(cls: any) {
     let params = {
-      class:cls,
-      adminId:this.adminId,
+      class: cls,
+      adminId: this.adminId,
     }
     this.feesStructureService.feesStructureByClass(params).subscribe((res: any) => {
       if (res) {
@@ -264,7 +265,7 @@ export class AdmissionComponent implements OnInit {
     this.cls = 0;
     this.rollNumberType = '';
     this.receiptMode = false;
-    this.admissionrReceiptInfo=null;
+    this.admissionrReceiptInfo = null;
     this.studentForm.reset();
   }
   addStudentModel() {
@@ -310,7 +311,7 @@ export class AdmissionComponent implements OnInit {
         filters: {},
         page: $event.page,
         limit: $event.limit ? $event.limit : this.recordLimit,
-        adminId:this.adminId,
+        adminId: this.adminId,
       };
       this.recordLimit = params.limit;
       if (this.filters.searchText) {
@@ -332,12 +333,14 @@ export class AdmissionComponent implements OnInit {
     if (this.studentForm.valid) {
       this.studentForm.value.adminId = this.adminId;
       this.studentForm.value.admissionType = 'New';
+      this.studentForm.value.discountAmountInFees = 500;
       this.studentForm.value.createdBy = 'Admin';
       this.studentService.addStudent(this.studentForm.value).subscribe((res: any) => {
         if (res) {
           if (res.studentAdmissionData.admissionType == "New" && res.studentAdmissionData.admissionFeesPaymentType == 'Immediate') {
             this.receiptMode = true;
             this.admissionrReceiptInfo = res.studentAdmissionData;
+            this.getStudentsByAdmission({ page: this.page });
           }
           if (res.studentAdmissionData.admissionType == "New" && res.studentAdmissionData.admissionFeesPaymentType == 'Later') {
             this.successDone();
@@ -354,7 +357,7 @@ export class AdmissionComponent implements OnInit {
   allOptions() {
     this.sessions = [{ year: '2023-24' }, { year: '2024-25' }, { year: '2025-26' }, { year: '2026-27' }, { year: '2027-28' }, { year: '2028-29' }, { year: '2029-30' }]
     this.categorys = [{ category: 'General' }, { category: 'OBC' }, { category: 'SC' }, { category: 'ST' }, { category: 'Other' }]
-    this.religions = [{ religion: 'Hinduism' }, { religion: 'Buddhism' }, { religion: 'Christanity' }, { religion: 'Jainism' }, { religion: 'Sikhism' },{ religion: 'Muslim' }, { religion: 'Other' }]
+    this.religions = [{ religion: 'Hinduism' }, { religion: 'Buddhism' }, { religion: 'Christanity' }, { religion: 'Jainism' }, { religion: 'Sikhism' }, { religion: 'Muslim' }, { religion: 'Other' }]
     this.qualifications = [{ qualification: 'Doctoral Degree' }, { qualification: 'Masters Degree' }, { qualification: 'Graduate Diploma' }, { qualification: 'Graduate Certificate' }, { qualification: 'Graduate Certificate' }, { qualification: 'Bachelor Degree' }, { qualification: 'Advanced Diploma' }, { qualification: 'Primary School' }, { qualification: 'High School' }, { qualification: 'Higher Secondary School' }, { qualification: 'Illiterate' }, { qualification: 'Other' }]
     this.occupations = [{ occupation: 'Agriculture(Farmer)' }, { occupation: 'Laborer' }, { occupation: 'Self Employed' }, { occupation: 'Private Job' }, { occupation: 'State Govt. Employee' }, { occupation: 'Central Govt. Employee' }, { occupation: 'Military Job' }, { occupation: 'Para-Military Job' }, { occupation: 'PSU Employee' }, { occupation: 'Other' }]
   }
