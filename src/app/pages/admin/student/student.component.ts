@@ -185,12 +185,10 @@ export class StudentComponent implements OnInit {
       }
     }
   }
-  chooseClass(event: any) {
-    if (event) {
-      if (this.stream) {
-        this.studentForm.get('stream')?.setValue(null);
-      }
-      this.cls = event.value;
+  chooseClass(cls: any) {
+    this.cls = cls;
+    if(cls<11 && cls!==0 || cls == 200 || cls==201 || cls==202){
+      this.studentForm.get('stream')?.setValue("N/A");
     }
   }
   chooseStream(event: any) {

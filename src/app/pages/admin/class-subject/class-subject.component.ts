@@ -104,6 +104,9 @@ export class ClassSubjectComponent implements OnInit {
 
   chooseClass(cls: any) {
     this.cls = cls;
+    if(cls<11 && cls!==0 || cls == 200 || cls==201 || cls==202){
+      this.classSubjectForm.get('stream')?.setValue("N/A");
+    }
   }
 
   getClass() {

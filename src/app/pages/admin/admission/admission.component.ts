@@ -39,11 +39,10 @@ export class AdmissionComponent implements OnInit {
   qualifications: any;
   occupations: any;
   stream: string = '';
-  notApplicable: String = "stream";
+  // notApplicable: String = "stream";
   streamMainSubject: any[] = ['Mathematics(Science)', 'Biology(Science)', 'History(Arts)', 'Sociology(Arts)', 'Political Science(Arts)', 'Accountancy(Commerce)', 'Economics(Commerce)', 'Agriculture', 'Home Science'];
   cls: number = 0;
   rollNumberType: string = '';
-  admissionFeesPaymentType: string = '';
   clsFeesStructure: any;
   schoolInfo: any;
   admissionrReceiptInfo: any;
@@ -59,7 +58,6 @@ export class AdmissionComponent implements OnInit {
       session: ['', Validators.required],
       admissionNo: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
       admissionFees: ['', Validators.required],
-      admissionFeesPaymentType: ['', Validators.required],
       rollNumberType: ['', Validators.required],
       rollNumber: ['', [Validators.required, Validators.maxLength(8), Validators.pattern('^[0-9]+$')]],
       class: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
@@ -180,25 +178,17 @@ export class AdmissionComponent implements OnInit {
     this.singleStudentInfo = student;
     this.showAdmissionPrintModal = true;
   }
-  chooseClass(event: any) {
+
+  chooseClass(cls: any) {
     this.errorCheck = false;
     this.errorMsg = '';
     this.cls = 0;
     this.clsFeesStructure = {};
-    if (event) {
-      if (this.stream) {
-        this.studentForm.get('stream')?.setValue(null);
-      }
-      this.cls = event.value;
-      if (this.cls) {
-        this.studentForm.get('admissionFees')?.setValue(null);
-        const cls = this.cls;
-        this.feesStructureByClass(cls);
-      }
+    this.cls = cls;
+    if (cls < 11 && cls !== 0 || cls == 200 || cls == 201 || cls == 202) {
+      this.studentForm.get('stream')?.setValue("N/A");
     }
-  }
-  chooseStream(event: any) {
-    this.stream = event.value;
+    this.feesStructureByClass(cls);
   }
   feesStructureByClass(cls: any) {
     let params = {
@@ -209,28 +199,13 @@ export class AdmissionComponent implements OnInit {
       if (res) {
         res.feesType = [{ Admission: res.admissionFees }, ...res.feesType];
         this.clsFeesStructure = res;
+        const admissionFees = this.clsFeesStructure?.admissionFees;
+        this.studentForm.get('admissionFees')?.setValue(admissionFees);
       }
     }, err => {
       this.errorCheck = true;
       this.errorMsg = err.error;
     })
-  }
-
-  chooseAdmissionFeesPayment(event: any) {
-    if (event) {
-      if (event.value == 'Immediate') {
-        this.admissionFeesPaymentType = event.value;
-        if (this.clsFeesStructure) {
-          const admissionFees = this.clsFeesStructure.admissionFees;
-          this.studentForm.get('admissionFees')?.setValue(admissionFees);
-        }
-      }
-      if (event.value == 'Later') {
-        this.admissionFeesPaymentType = event.value;
-        const admissionFees = 0;
-        this.studentForm.get('admissionFees')?.setValue(admissionFees);
-      }
-    }
   }
   chooseRollNumberType(event: any) {
     if (event) {
@@ -337,14 +312,10 @@ export class AdmissionComponent implements OnInit {
       this.studentForm.value.createdBy = 'Admin';
       this.studentService.addStudent(this.studentForm.value).subscribe((res: any) => {
         if (res) {
-          if (res.studentAdmissionData.admissionType == "New" && res.studentAdmissionData.admissionFeesPaymentType == 'Immediate') {
+          if (res.studentAdmissionData.admissionType == "New") {
             this.receiptMode = true;
             this.admissionrReceiptInfo = res.studentAdmissionData;
             this.getStudentsByAdmission({ page: this.page });
-          }
-          if (res.studentAdmissionData.admissionType == "New" && res.studentAdmissionData.admissionFeesPaymentType == 'Later') {
-            this.successDone();
-            this.successMsg = res.successMsg;
           }
         }
       }, err => {

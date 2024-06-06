@@ -50,7 +50,7 @@
                     <th>Otp</th>
                     <th>Session</th>
                     <th>Status</th>
-                    <th>Class Promote</th>
+                    <th *ngIf="className!=12">Class Promote</th>
                     <th>Transfer Certificate</th>
                     <th>View</th>
                     <!-- <th>Edit</th> -->
@@ -90,7 +90,7 @@
                       <a class="mb-0 status-inactive" (click)="changeStatus(students._id,1)"
                         *ngIf="students.status == 'Inactive'" href="javascript:void(0)">{{students.status}}</a>
                     </td>
-                    <td>
+                    <td *ngIf="className!=12">
                       <button style="background-color: transparent;color: #8d6dff;border: 1px solid #8d6dff;"
                         class="submit-button" (click)="addStudentClassPromoteModel(students)"
                         mat-raised-button>Promote</button>
@@ -177,7 +177,7 @@
                                 <mat-label>Class Applied for</mat-label>
                                 <mat-select matInput formControlName="class">
                                   <div>
-                                    <mat-option [value]="className" (click)="chooseClass(studentForm.get('class'))">
+                                    <mat-option [value]="className" (click)="chooseClass(className)">
                                       {{ className | classSuffix }}
                                     </mat-option>
                                   </div>
@@ -198,14 +198,12 @@
                                 <mat-select type="text" matInput formControlName="stream">
                                   <ng-container *ngIf="cls==12 || cls==11">
                                     <div *ngFor="let subject of streamMainSubject">
-                                      <mat-option (click)="chooseStream(studentForm.get('stream'))"
-                                        value="{{subject}}">{{subject}}</mat-option>
+                                      <mat-option value="{{subject}}">{{subject}}</mat-option>
                                     </div>
                                   </ng-container>
                                   <ng-container *ngIf="cls<11 && cls!==0 || cls == 200 || cls==201 || cls==202">
                                     <div>
-                                      <mat-option value="{{notApplicable}}"
-                                        (click)="chooseStream(studentForm.get('stream'))">N/A</mat-option>
+                                      <mat-option value="N/A">N/A</mat-option>
                                     </div>
                                   </ng-container>
                                 </mat-select>
