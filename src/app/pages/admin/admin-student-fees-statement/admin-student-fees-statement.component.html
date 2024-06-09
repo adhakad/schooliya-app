@@ -10,25 +10,10 @@
                     <div class="row mt-2">
                         <div #content class="custom-container">
                             <div class="table-container">
-                                <table class="logo-table text-bold text-center">
-                                    <tr>
-                                        <td>
-                                            <img src="../../../../assets/logo.png" alt="">
-                                            {{schoolInfo?.schoolName | uppercase}}, {{schoolInfo?.city | uppercase}}
-                                        </td>
-                                    </tr>
-                                </table>
                                 <table class="info-table text-center">
                                     <tr>
                                         <td>
-                                            School Code : {{schoolInfo?.schoolCode}}
-                                        </td>
-                                        <td>
                                             School Fee Statement - {{studentInfo[0]?.session}}
-                                        </td>
-                                        <td>
-                                            Affiliation No. :
-                                            {{schoolInfo?.affiliationNumber}}
                                         </td>
                                     </tr>
                                 </table>
@@ -80,7 +65,6 @@
                                     <tr>
                                         <th>S.No.</th>
                                         <th>Receipt No.</th>
-                                        <th>Installment</th>
                                         <th>Fee Amount</th>
                                         <th>Payment Date</th>
                                         <th>Fee Receipt</th>
@@ -96,9 +80,6 @@
                                                 <span *ngIf="fee.receiptNo!==0">{{ fee.receiptNo }}</span>
                                             </td>
                                             <td>
-                                                {{ fee.installment |titlecase }}
-                                            </td>
-                                            <td>
                                                 &#8377; {{ fee.paidAmount }}
                                             </td>
                                             <td>
@@ -108,7 +89,7 @@
                                             <td>
                                                 <span *ngIf="fee.receiptNo==0">-</span>
                                                 <mat-icon *ngIf="fee.receiptNo!==0"
-                                                    (click)="feeReceipt(fee.installment)">launch</mat-icon>
+                                                    (click)="feeReceipt(fee.paymentDate)">launch</mat-icon>
                                             </td>
                                             <td>
                                                 <span *ngIf="fee.paymentDate==0">-</span>
@@ -194,6 +175,14 @@
                                                 <td class="border" *ngFor="let fee of item | keyvalue">
                                                     &#8377; {{ fee.value}}</td>
                                             </tr>
+                                            <tr class="text-center">
+                                                <td class="border"></td>
+                                                <td class="border">
+                                                    Discount Amount</td>
+                                                <td class="border">
+                                                  - &#8377;
+                                                    {{singleReceiptInstallment[0]?.discountAmountInFees}}</td>
+                                            </tr>
                                             <tr class="text-center receipt-row">
                                                 <td></td>
                                                 <td class="text-bold text-right">Total Fee</td>
@@ -215,10 +204,8 @@
                                             <tr>
                                                 <td></td>
                                                 <td>
-                                                    <p class="text-center"><span class="text-bold">{{
-                                                            singleReceiptInstallment[0]?.installment |titlecase
-                                                            }}</span>
-                                                        installment amount deposited <span class="text-bold">&#8377; {{
+                                                    <p class="text-center">
+                                                        Fee amount deposited <span class="text-bold">&#8377; {{
                                                             singleReceiptInstallment[0]?.paidAmount }} /-</span></p>
                                                 </td>
                                                 <td></td>

@@ -28,11 +28,9 @@
                     <th>Student</th>
                     <th>Class</th>
                     <th>Roll Number</th>
-                    <th>Admission Type</th>
-                    <th>Otp</th>
                     <th>Session</th>
                     <th>Admission By</th>
-                    <th>Print</th>
+                    <th>Admission Letter</th>
                   </tr>
                 </thead>
                 <tbody *ngIf="studentInfo && studentInfo.length>0">
@@ -51,12 +49,6 @@
                     </td>
                     <td>
                       <p class="mb-0">{{students.rollNumber}}</p>
-                    </td>
-                    <td>
-                      <p class="mb-0">{{students.admissionType | titlecase}}</p>
-                    </td>
-                    <td>
-                      <p class="mb-0">{{students.otp}}</p>
                     </td>
                     <td>
                       <p class="mb-0">{{students.session}}</p>
@@ -112,7 +104,8 @@
                                 <mat-select matInput formControlName="class">
                                   <div *ngFor="let classInfo of classInfo">
                                     <mat-option value="{{classInfo.class}}"
-                                      (click)="chooseClass(classInfo.class)">{{classInfo.class | classSuffix}}</mat-option>
+                                      (click)="chooseClass(classInfo.class)">{{classInfo.class |
+                                      classSuffix}}</mat-option>
                                   </div>
                                 </mat-select>
                                 <mat-error
@@ -150,7 +143,7 @@
                                 </mat-error>
                               </mat-form-field>
                             </div>
-                            
+
                             <div class="col-12 col-lg-6">
                               <mat-form-field appearance="outline">
                                 <mat-label>Admission Fee In &#8377;</mat-label>
@@ -161,7 +154,7 @@
                                 </mat-error>
                               </mat-form-field>
                             </div>
-                            
+
                             <ng-container>
                               <h3>Academic Info</h3>
                             </ng-container>
@@ -701,8 +694,9 @@
                               <div class="table-container">
                                 <div class="row text-center">
                                   <div class="col-12" style="text-align: center;">
-                                    <div class="school-name"> <img class="logo" src="../../../../assets/logo.png"
-                                        alt="">
+                                    <div class="school-name">
+                                      <!-- <img class="logo" src="../../../../assets/logo.png"
+                                        alt=""> -->
                                       <h3 class="text-bold">{{schoolInfo?.schoolName | uppercase}}, {{schoolInfo?.city |
                                         uppercase}}</h3>
                                     </div>
@@ -826,6 +820,11 @@
                                     <td>{{singleStudentInfo?.fatherContact}}</td>
                                     <td class="text-bold">Mother Annual Income :</td>
                                     <td>{{singleStudentInfo?.motherAnnualIncome}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td class="text-bold">Admission Fee :</td>
+                                    <td colspan="3">&#8377; {{singleStudentInfo?.admissionFees}} <span
+                                        class="text-bold">PAID</span></td>
                                   </tr>
                                 </table>
 

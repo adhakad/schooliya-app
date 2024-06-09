@@ -39,7 +39,7 @@ const FeesCollectionModel = mongoose.model('fees-collection', {
     trim: true,
     default: 'empty'
   },
-  discountAmountInFees:{
+  discountAmountInFees: {
     type: Number,
     required: true,
     trim: true,
@@ -59,10 +59,22 @@ const FeesCollectionModel = mongoose.model('fees-collection', {
     required: true,
     trim: true,
   },
-  installment: {},
-  receipt: {},
-  paymentDate: {},
-  createdBy: {}
+  installment: {
+    type: [Number],
+    default: []
+  },
+  receipt: {
+    type: [Number],
+    default: []
+  },
+  paymentDate: {
+    type: [String],
+    default: []
+  },
+  createdBy: {
+    type: [String],
+    default: []
+  }
 });
 
 module.exports = FeesCollectionModel;

@@ -56,12 +56,6 @@ let CreateFeesStructure = async (req, res, next) => {
         }
         let feesStructure = await FeesStructureModel.create(feesStructureData);
         if (feesStructure) {
-            // let installment = feesStructure.installment;
-            // installment.forEach((item) => {
-            //     Object.keys(item).forEach((key) => {
-            //         item[key] = 0;
-            //     });
-            // });
             let admissionFees = feesStructure.admissionFees;
             let checkStudent = await StudentModel.find({adminId:adminId, class: className });
             if (checkStudent) {
@@ -77,9 +71,6 @@ let CreateFeesStructure = async (req, res, next) => {
                         totalFees: totalFees,
                         paidFees: 0,
                         dueFees: totalFees,
-                        // receipt: installment,
-                        // installment: installment,
-                        // paymentDate: installment,
                     };
 
                     if (student.admissionType === 'New') {

@@ -162,11 +162,6 @@ const StudentModel = mongoose.model('student', {
         required: true,
         trim: true,
     },
-    otp: {
-        type: Number,
-        required: true,
-        trim: true,
-    },
     status: {
         type: String,
         required: true,

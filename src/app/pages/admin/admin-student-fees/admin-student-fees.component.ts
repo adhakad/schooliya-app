@@ -55,7 +55,6 @@ export class AdminStudentFeesComponent implements OnInit {
       class: [''],
       studentId: [''],
       feesAmount: [''],
-      feesInstallment: [''],
       createdBy:[''],
     });
   }
@@ -144,33 +143,6 @@ export class AdminStudentFeesComponent implements OnInit {
   }
   studentFeesPay(student: any) {
     this.singleStudent = student;
-    const admissionFees = student.admissionFees;
-    const admissionFeesAmount = this.clsFeesStructure.admissionFees;
-    const admissionFeesPayable = student.admissionFeesPayable;
-    if ("Admission" in this.clsFeesStructure.feesType[0]) {
-      this.clsFeesStructure.feesType.shift();
-    }
-    if (admissionFeesPayable == true) {
-      this.clsFeesStructure.feesType = [{ Admission: this.clsFeesStructure.admissionFees }, ...this.clsFeesStructure.feesType];
-    }
-    
-    if (admissionFees == 0 && admissionFeesPayable == true) {
-      this.paybleInstallment = [["Admission Fees", admissionFeesAmount]];
-    }
-
-    if (admissionFees > 0 && admissionFeesPayable == true || admissionFees == 0 && admissionFeesPayable == false) {
-      const installment = this.singleStudent.installment;
-      const result = installment.find((installment: any) => {
-        const [key, value] = Object.entries(installment)[0];
-        return value === 0;
-      });
-      if (result) {
-        const [key, value] = Object.entries(result)[0];
-        this.paybleInstallment = this.clsFeesStructure.installment.flatMap((item: any) => Object.entries(item).filter(([keys, values]) => keys === key));
-      } else {
-        this.paybleInstallment = [0, 0];
-      }
-    }
     this.showModal = true;
     this.deleteMode = false;
     this.updateMode = false;
@@ -233,29 +205,9 @@ export class AdminStudentFeesComponent implements OnInit {
         this.feesForm.value.class = this.singleStudent.class;
         this.feesForm.value.createdBy = "Admin";
         this.feesForm.value.studentId = this.singleStudent.studentId;
-        this.feesForm.value.feesInstallment = this.paybleInstallment[0][0];
-        this.feesForm.value.feesAmount = this.paybleInstallment[0][1];
-        if (this.paybleInstallment[0][0] == "Admission Fees") {
-          this.feesService.addAdmissionFees(this.feesForm.value).subscribe((res: any) => {
-            if (res) {
-              this.receiptMode = true;
-              this.receiptInstallment = {
-                class: res.className,
-                receiptNo: res.admissionFeesReceiptNo,
-                studentId: res.studentId,
-                totalFees: res.totalFees,
-                paidFees: res.paidFees,
-                dueFees: res.dueFees,
-                feesInstallment: 'Admission Fees',
-                feesAmount: res.admissionFees,
-                paymentDate: res.admissionFeesPaymentDate
-              };
-            }
-          }, err => {
-            this.errorCheck = true;
-            this.errorMsg = err.error;
-          })
-        } else {
+        
+          
+        
           this.feesService.addFees(this.feesForm.value).subscribe((res: any) => {
             if (res) {
               this.receiptMode = true;
@@ -265,7 +217,6 @@ export class AdminStudentFeesComponent implements OnInit {
             this.errorCheck = true;
             this.errorMsg = err.error;
           })
-        }
       }
     }
   }

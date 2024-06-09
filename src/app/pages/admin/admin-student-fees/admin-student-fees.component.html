@@ -87,7 +87,7 @@
                                             <mat-icon matRipple (click)="closeModal()">close</mat-icon>
                                         </div>
                                         <form [formGroup]="feesForm" (ngSubmit)="feesAddUpdate()"
-                                            *ngIf="!deleteMode && paybleInstallment && singleStudent && !receiptMode">
+                                            *ngIf="!deleteMode && singleStudent && !receiptMode">
                                             <div class="modal-body">
                                                 <div *ngIf="errorCheck">
                                                     <p class="error-message">{{errorMsg}}</p>
@@ -95,28 +95,7 @@
                                                 <div class="row">
                                                     <div class="custom-container">
                                                         <div class="table-container">
-                                                            <table class="logo-table text-bold text-center">
-                                                                <tr>
-                                                                    <td>
-                                                                        <img src="../../../../assets/logo.png" alt="">
-                                                                        {{schoolInfo?.schoolName | uppercase}}, {{schoolInfo?.city | uppercase}}
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
-                                                            <table class="info-table text-center">
-                                                                <tr>
-                                                                    <td>
-                                                                        School Code : {{schoolInfo?.schoolCode}}
-                                                                    </td>
-                                                                    <td>
-                                                                        School Fee - {{singleStudent.session}}
-                                                                    </td>
-                                                                    <td>
-                                                                        Affiliation No. :
-                                                                        {{schoolInfo?.affiliationNumber}}
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
+
                                                             <table class="info-table text-center">
                                                                 <tr>
                                                                     <td class="text-bold">Admission No. :</td>
@@ -161,24 +140,28 @@
                                                                     </ng-container>
                                                                 </tr>
                                                             </table>
+                                                            <div style="height: 500px;"></div>
+
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="modal-footer" *ngIf="paybleInstallment[0][1]>0 && !receiptMode">
-                                                <mat-checkbox *ngIf="paybleInstallment[0][0]!=='Admission Fees'"
-                                                    style="margin-right: 8px;" class="example-margin"
-                                                    (click)="feesPay(payNow)">Allow {{paybleInstallment[0][0]}}
-                                                    Installment</mat-checkbox>
-                                                <mat-checkbox *ngIf="paybleInstallment[0][0]=='Admission Fees'"
-                                                    style="margin-right: 8px;" class="example-margin"
-                                                    (click)="feesPay(payNow)">Allow
-                                                    {{paybleInstallment[0][0]}}</mat-checkbox>
+                                            <div class="modal-footer">
+                                                <div class="row">
+                                                    <div class="col-6 col-lg-6">
+                                                        <mat-form-field appearance="outline">
+                                                            <mat-label>Fee Amount In &#8377;</mat-label>
+                                                            <input matInput type="number" formControlName="feesAmount">
+                                                        </mat-form-field>
 
-                                                <button class="submit-button" mat-raised-button type="button"
-                                                    (click)="feesAddUpdate()" [disabled]="!payNow">Pay
-                                                    &#8377;
-                                                    {{paybleInstallment[0][1]}}</button>
+                                                    </div>
+                                                    <div class="col-4 offset-2 col-lg-4">
+                                                        <button class="submit-button" mat-raised-button type="button"
+                                                            (click)="feesAddUpdate()">Pay Now
+                                                        </button>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </form>
                                         <div class="modal-body"
@@ -191,7 +174,8 @@
                                                                 <td>
                                                                 <td>
                                                                     <img src="../../../../assets/logo.png" alt="">
-                                                                    {{schoolInfo?.schoolName | uppercase}}, {{schoolInfo?.city | uppercase}}
+                                                                    {{schoolInfo?.schoolName | uppercase}},
+                                                                    {{schoolInfo?.city | uppercase}}
                                                                 </td>
                                                             </tr>
                                                         </table>
@@ -244,6 +228,14 @@
                                                                 <td class="border" *ngFor="let fee of item | keyvalue">
                                                                     &#8377; {{ fee.value}}</td>
                                                             </tr>
+                                                            <tr class="text-center">
+                                                                <td class="border"></td>
+                                                                <td class="border">
+                                                                    Discount Amount</td>
+                                                                <td class="border">
+                                                                   - &#8377;
+                                                                    {{receiptInstallment.discountAmountInFees}}</td>
+                                                            </tr>
                                                             <tr class="text-center receipt-row">
                                                                 <td></td>
                                                                 <td class="text-bold text-right">Total Fee</td>
@@ -267,7 +259,7 @@
                                                                 <td>
                                                                     <p class="text-center"><span class="text-bold">
                                                                             {{receiptInstallment.feesInstallment}}</span>
-                                                                        installment amount deposited <span
+                                                                        Fee amount deposited <span
                                                                             class="text-bold">&#8377;
                                                                             {{receiptInstallment.feesAmount}} /-</span>
                                                                     </p>

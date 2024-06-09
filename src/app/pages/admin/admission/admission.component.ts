@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { StudentService } from 'src/app/services/student.service';
 import { ClassService } from 'src/app/services/class.service';
+import { FeesService } from 'src/app/services/fees.service';
 import { FeesStructureService } from 'src/app/services/fees-structure.service';
 import { PrintPdfService } from 'src/app/services/print-pdf/print-pdf.service';
 import { AdminAuthService } from 'src/app/services/auth/admin-auth.service';
@@ -48,10 +49,11 @@ export class AdmissionComponent implements OnInit {
   admissionrReceiptInfo: any;
   singleStudentInfo: any;
   receiptMode: boolean = false;
+  studentFeesCollection: any;
   baseURL!: string;
   loader: Boolean = true;
   adminId!: String
-  constructor(private fb: FormBuilder, private adminAuthService: AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private classService: ClassService, private studentService: StudentService, private feesStructureService: FeesStructureService) {
+  constructor(private fb: FormBuilder, private adminAuthService: AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private classService: ClassService, private studentService: StudentService, private feesStructureService: FeesStructureService, private feesService: FeesService,) {
     this.studentForm = this.fb.group({
       _id: [''],
       adminId: [''],
@@ -92,7 +94,7 @@ export class AdmissionComponent implements OnInit {
   ngOnInit(): void {
     let getAdmin = this.adminAuthService.getLoggedInAdminInfo();
     this.adminId = getAdmin?.id;
-    this.getSchool();
+    this.getSchool(this.adminId);
     let load: any = this.getStudentsByAdmission({ page: 1 });
     this.getClass();
     this.allOptions();
@@ -167,16 +169,21 @@ export class AdmissionComponent implements OnInit {
     return printHtml;
   }
 
-  getSchool() {
-    this.schoolService.getSchool(this.adminId).subscribe((res: any) => {
+  getSchool(adminId: any) {
+    this.schoolService.getSchool(adminId).subscribe((res: any) => {
       if (res) {
         this.schoolInfo = res;
       }
     })
   }
   addPrintModal(student: any) {
-    this.singleStudentInfo = student;
-    this.showAdmissionPrintModal = true;
+    this.feesService.singleStudentFeesCollectionById(student._id).subscribe((res: any) => {
+      if (res) {
+        this.singleStudentInfo = student;
+        this.singleStudentInfo.admissionFees = res.studentFeesCollection.admissionFees;
+        this.showAdmissionPrintModal = true;
+      }
+    })
   }
 
   chooseClass(cls: any) {

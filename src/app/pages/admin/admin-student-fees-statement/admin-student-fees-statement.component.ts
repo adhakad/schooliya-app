@@ -23,9 +23,9 @@ export class AdminStudentFeesStatementComponent implements OnInit {
   singleReceiptInstallment: any[] = [];
   studentInfo: any[] = [];
   schoolInfo: any;
-  loader:Boolean=true;
-  adminId!:string;
-  constructor(public activatedRoute: ActivatedRoute,private adminAuthService:AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) { }
+  loader: Boolean = true;
+  adminId!: string;
+  constructor(public activatedRoute: ActivatedRoute, private adminAuthService: AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) { }
 
   ngOnInit(): void {
     this.getSchool();
@@ -63,7 +63,8 @@ export class AdminStudentFeesStatementComponent implements OnInit {
   feeReceipt(singleInstallment: any) {
     const data: any = this.processedData
     const desiredInstallment = singleInstallment;
-    this.singleReceiptInstallment = Object.values(data).filter((item: any) => item.installment === desiredInstallment);
+    this.singleReceiptInstallment = data.filter((item: any) => item.paymentDate === desiredInstallment);
+    this.singleReceiptInstallment[0].discountAmountInFees = this.studentFeesCollection.discountAmountInFees;
     this.showModal = true;
 
   }
@@ -80,8 +81,8 @@ export class AdminStudentFeesStatementComponent implements OnInit {
 
   feesStructureByClass(cls: any) {
     let params = {
-      class:cls,
-      adminId:this.adminId,
+      class: cls,
+      adminId: this.adminId,
     }
     this.feesStructureService.feesStructureByClass(params).subscribe((res: any) => {
       if (res) {
@@ -97,27 +98,23 @@ export class AdminStudentFeesStatementComponent implements OnInit {
   }
 
   processData() {
-    let allPaidAmount = this.studentFeesCollection.admissionFees;
+    let allPaidAmount = this.studentFeesCollection.admissionFees; 
     for (let i = 0; i < this.studentFeesCollection.installment.length; i++) {
-      const receiptNo = Object.values(this.studentFeesCollection.receipt[i])[0];
-      const installment = Object.keys(this.studentFeesCollection.installment[i])[0];
-      const paidAmount:any = Object.values(this.studentFeesCollection.installment[i])[0];
-      const paymentDate = Object.values(this.studentFeesCollection.paymentDate[i])[0];
-      const createdBy =  Object.values(this.studentFeesCollection.createdBy[i])[0];
+      const receiptNo = this.studentFeesCollection.receipt[i];
+      const paidAmount: any = this.studentFeesCollection.installment[i];
+      const paymentDate = this.studentFeesCollection.paymentDate[i];
+      const createdBy = this.studentFeesCollection.createdBy[i];
       allPaidAmount += paidAmount;
       this.processedData.push({
         allPaidAmount,
         receiptNo,
-        installment,
         paidAmount,
         paymentDate,
         createdBy
       });
     }
-    setTimeout(()=>{
+    setTimeout(() => {
       this.loader = false;
-    },1000);
-    console.log(this.processedData)
+    }, 1000);
   }
-
 }

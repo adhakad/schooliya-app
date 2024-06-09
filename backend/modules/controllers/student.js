@@ -1,6 +1,5 @@
 'use strict';
 const StudentModel = require('../models/student');
-const StudentUserModel = require('../models/users/student-user');
 const FeesStructureModel = require('../models/fees-structure');
 const FeesCollectionModel = require('../models/fees-collection');
 const AdmitCardModel = require('../models/admit-card');
@@ -129,7 +128,7 @@ let GetStudentPaginationByClass = async (req, res, next) => {
 
 let GetAllStudentByClass = async (req, res, next) => {
     try {
-        let singleStudent = await StudentModel.find({ adminId: req.params.id, class: req.params.class }, '-otp -status -__v').sort({ _id: -1 });
+        let singleStudent = await StudentModel.find({ adminId: req.params.id, class: req.params.class }, '-status -__v').sort({ _id: -1 });
         return res.status(200).json(singleStudent);
     } catch (error) {
         return res.status(500).json('Internal Server Error !');
@@ -146,7 +145,6 @@ let GetSingleStudent = async (req, res, next) => {
 }
 
 let CreateStudent = async (req, res, next) => {
-    let otp = Math.floor(Math.random() * 899999 + 100000);
     let receiptNo = Math.floor(Math.random() * 899999 + 100000);
     const currentDateIst = DateTime.now().setZone('Asia/Kolkata');
     const istDateTimeString = currentDateIst.toFormat('dd-MM-yyyy hh:mm:ss a');
@@ -169,7 +167,7 @@ let CreateStudent = async (req, res, next) => {
         dob = DateTime.fromISO(dob).toFormat("dd-MM-yyyy");
     }
     const studentData = {
-        adminId, name, rollNumber, aadharNumber, samagraId, otp, session, admissionType, stream, admissionNo, class: className, admissionClass, dob: dob, doa: doa, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome, discountAmountInFees, createdBy
+        adminId, name, rollNumber, aadharNumber, samagraId, session, admissionType, stream, admissionNo, class: className, admissionClass, dob: dob, doa: doa, gender, category, religion, nationality, contact, address, lastSchool, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome, discountAmountInFees, createdBy
     }
     try {
         const checkFeesStr = await FeesStructureModel.findOne({ adminId: adminId, class: className });
@@ -202,17 +200,10 @@ let CreateStudent = async (req, res, next) => {
         let paidFees = 0;
         let dueFees = totalFees - paidFees;
 
-        if (admissionType == 'New' && admissionFeesPaymentType == 'Immediate') {
+        if (admissionType == 'New') {
             admissionFeesPayable = true;
             admissionFees = admissionFees;
             totalFees = totalFees + admissionFees;
-            paidFees = admissionFees;
-            dueFees = totalFees - admissionFees;
-        }
-        if (admissionType == 'New' && admissionFeesPaymentType == 'Later') {
-            admissionFeesPayable = true;
-            admissionFees = 0;
-            totalFees = totalFees + admissionFee;
             paidFees = admissionFees;
             dueFees = totalFees - admissionFees;
         }
@@ -225,10 +216,6 @@ let CreateStudent = async (req, res, next) => {
             totalFees: totalFees,
             paidFees: paidFees,
             dueFees: dueFees,
-            installment: {},
-            receipt: {},
-            paymentDate: {},
-            createdBy: {}
         }
         if (admissionType == 'New' && admissionFeesPaymentType == 'Immediate') {
             studentFeesData.admissionFeesReceiptNo = receiptNo;
@@ -325,14 +312,12 @@ let CreateBulkStudentRecord = async (req, res, next) => {
     });
     let studentData = [];
     for (const student of bulkStudentRecord) {
-        let otp = Math.floor(Math.random() * 899999 + 100000);
         studentData.push({
             adminId: adminId,
             name: student.name,
             rollNumber: student.rollNumber,
             aadharNumber: student.aadharNumber,
             samagraId: student.samagraId,
-            otp: otp,
             session: student.session,
             admissionType: student.admissionType,
             stream: student.stream,
@@ -432,12 +417,6 @@ let CreateBulkStudentRecord = async (req, res, next) => {
         if (!checkFeesStr) {
             return res.status(404).json(`Please create fees structure for class ${className} !`);
         }
-        let installment = checkFeesStr.installment;
-        installment.forEach((item) => {
-            Object.keys(item).forEach((key) => {
-                item[key] = 0;
-            });
-        });
 
         const createStudent = await StudentModel.create(studentData, { session });
 
@@ -456,10 +435,6 @@ let CreateBulkStudentRecord = async (req, res, next) => {
                 totalFees: totalFees,
                 paidFees: 0,
                 dueFees: totalFees,
-                receipt: installment,
-                installment: installment,
-                paymentDate: installment,
-                createdBy: installment,
             };
 
             if (student.admissionType === 'New') {
@@ -499,7 +474,7 @@ let UpdateStudent = async (req, res, next) => {
         const id = req.params.id;
         let { name, rollNumber, aadharNumber, samagraId, session, admissionType, stream, admissionNo, dob, gender, category, religion, nationality, contact, address, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome } = req.body;
         const studentData = {
-            name, rollNumber, aadharNumber, samagraId, otp, session, admissionType, stream, admissionNo, class: className, dob: dob, doa: doa, gender, category, religion, nationality, contact, address, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome
+            name, rollNumber, aadharNumber, samagraId, session, admissionType, stream, admissionNo, class: className, dob: dob, doa: doa, gender, category, religion, nationality, contact, address, fatherName, fatherQualification, fatherOccupation, fatherContact, fatherAnnualIncome, motherName, motherQualification, motherOccupation, motherContact, motherAnnualIncome
         }
         const updateStudent = await StudentModel.findByIdAndUpdate(id, { $set: studentData }, { new: true });
         return res.status(200).json('Student update successfully.');
@@ -551,7 +526,6 @@ let StudentClassPromote = async (req, res, next) => {
                 FeesCollectionModel.findOneAndDelete({ studentId: studentId }),
             ]);
             const totalFees = checkFeesStr.totalFees;
-            const installment = checkFeesStr.installment.map(item => Object.fromEntries(Object.keys(item).map(key => [key, 0])));
             const studentFeesData = {
                 adminId: adminId,
                 studentId,
@@ -561,10 +535,6 @@ let StudentClassPromote = async (req, res, next) => {
                 totalFees: totalFees,
                 paidFees: 0,
                 dueFees: totalFees,
-                receipt: installment,
-                installment: installment,
-                paymentDate: installment,
-                createdBy: installment,
             };
             let createStudentFeesData = await FeesCollectionModel.create(studentFeesData);
             if (createStudentFeesData) {
@@ -596,14 +566,13 @@ let DeleteStudent = async (req, res, next) => {
         const id = req.params.id;
         const deleteStudent = await StudentModel.findByIdAndRemove(id);
         if (deleteStudent) {
-            const [deleteStudentUser, deleteAdmitCard, deleteExamResult, deleteFeesCollection] = await Promise.all([
-                StudentUserModel.deleteOne({ studentId: id }),
+            const [ deleteAdmitCard, deleteExamResult, deleteFeesCollection] = await Promise.all([
                 AdmitCardModel.deleteOne({ studentId: id }),
                 ExamResultModel.deleteOne({ studentId: id }),
                 FeesCollectionModel.deleteOne({ studentId: id }),
             ]);
 
-            if (deleteStudentUser || deleteAdmitCard || deleteExamResult || deleteFeesCollection) {
+            if (deleteAdmitCard || deleteExamResult || deleteFeesCollection) {
                 return res.status(200).json('Student delete successfully.');
             }
             return res.status(200).json('Student delete successfully.');

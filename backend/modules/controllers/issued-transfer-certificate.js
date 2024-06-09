@@ -1,6 +1,5 @@
 'use strict';
 const StudentModel = require('../models/student');
-const StudentUserModel = require('../models/users/student-user');
 const FeesCollectionModel = require('../models/fees-collection');
 const AdmitCardModel = require('../models/admit-card');
 const ExamResultModel = require('../models/exam-result');
@@ -54,13 +53,12 @@ let CreateIssuedTransferCertificate = async (req, res, next) => {
     try {
         const deleteStudent = await StudentModel.findByIdAndRemove(id);
         if (deleteStudent) {
-            const [deleteStudentUser, deleteAdmitCard, deleteExamResult, deleteFeesCollection] = await Promise.all([
-                StudentUserModel.deleteOne({ studentId: id }),
+            const [ deleteAdmitCard, deleteExamResult, deleteFeesCollection] = await Promise.all([
                 AdmitCardModel.deleteOne({ studentId: id }),
                 ExamResultModel.deleteOne({ studentId: id }),
                 FeesCollectionModel.deleteOne({ studentId: id }),
             ]);
-            if (deleteStudentUser || deleteAdmitCard || deleteExamResult || deleteFeesCollection) {
+            if (deleteAdmitCard || deleteExamResult || deleteFeesCollection) {
                 let createIssuedTransferCertificate = await IssuedTransferCertificateModel.create(studentData);
                 if (createIssuedTransferCertificate) {
                     return res.status(200).json('IssueTransferCertificate');

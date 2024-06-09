@@ -3,7 +3,6 @@
 module.exports = app => {
     app.use('/v1/school',require('./modules/routes/school'));
     app.use('/v1/admin', require('./modules/routes/users/admin-user'));
-    app.use('/v1/student-user', require('./modules/routes/users/student-user'));
     app.use('/v1/teacher-user', require('./modules/routes/users/teacher-user'));
     app.use('/v1/ads', require('./modules/routes/ads'));
     app.use('/v1/banner', require('./modules/routes/banner'));
