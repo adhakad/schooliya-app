@@ -72,6 +72,8 @@ let CreateFeesCollection = async (req, res, next) => {
             dueFees: dueFees,
             feesAmount: feesAmount,
             paymentDate: istDateTimeString,
+            admissionFeesPayable:checkFeesCollection.admissionFeesPayable,
+            admissionFees:checkFeesCollection.admissionFees,
             createdBy:createdBy
         }
         const updatedDocument = await FeesCollectionModel.findByIdAndUpdate(id, {

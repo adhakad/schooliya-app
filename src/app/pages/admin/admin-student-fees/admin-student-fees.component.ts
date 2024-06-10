@@ -47,15 +47,15 @@ export class AdminStudentFeesComponent implements OnInit {
   payNow: boolean = false;
   receiptInstallment: any = {};
   receiptMode: boolean = false;
-  loader:Boolean=true;
-  adminId!:string;
-  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute,private adminAuthService: AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) {
+  loader: Boolean = true;
+  adminId!: string;
+  constructor(private fb: FormBuilder, public activatedRoute: ActivatedRoute, private adminAuthService: AdminAuthService, private schoolService: SchoolService, private printPdfService: PrintPdfService, private feesService: FeesService, private feesStructureService: FeesStructureService) {
     this.feesForm = this.fb.group({
-      adminId:[''],
+      adminId: [''],
       class: [''],
       studentId: [''],
       feesAmount: [''],
-      createdBy:[''],
+      createdBy: [''],
     });
   }
 
@@ -86,8 +86,8 @@ export class AdminStudentFeesComponent implements OnInit {
 
   getAllStudentFeesCollectionByClass(cls: any) {
     let params = {
-      class:cls,
-      adminId:this.adminId,
+      class: cls,
+      adminId: this.adminId,
     }
     this.feesService.getAllStudentFeesCollectionByClass(params).subscribe((res: any) => {
       if (res) {
@@ -100,17 +100,17 @@ export class AdminStudentFeesComponent implements OnInit {
         }));
 
         this.studentList = combinedData;
-        setTimeout(()=>{
+        setTimeout(() => {
           this.loader = false;
-        },1000)
+        }, 1000)
       }
     })
   }
 
   feesStructureByClass(cls: any) {
     let params = {
-      class:cls,
-      adminId:this.adminId,
+      class: cls,
+      adminId: this.adminId,
     }
     this.feesStructureService.feesStructureByClass(params).subscribe((res: any) => {
       if (res) {
@@ -205,18 +205,24 @@ export class AdminStudentFeesComponent implements OnInit {
         this.feesForm.value.class = this.singleStudent.class;
         this.feesForm.value.createdBy = "Admin";
         this.feesForm.value.studentId = this.singleStudent.studentId;
-        
-          
-        
-          this.feesService.addFees(this.feesForm.value).subscribe((res: any) => {
-            if (res) {
-              this.receiptMode = true;
-              this.receiptInstallment = res;
+
+
+
+        this.feesService.addFees(this.feesForm.value).subscribe((res: any) => {
+          if (res) {
+            this.receiptMode = true;
+            this.receiptInstallment = res;
+            if (res.admissionFeesPayable == true) {
+              this.clsFeesStructure.feesType = [{ Admission: res.admissionFees }, ...this.clsFeesStructure.feesType];
             }
-          }, err => {
-            this.errorCheck = true;
-            this.errorMsg = err.error;
-          })
+            if (res.admissionFeesPayable == false) {
+              this.clsFeesStructure = this.clsFeesStructure;
+            }
+          }
+        }, err => {
+          this.errorCheck = true;
+          this.errorMsg = err.error;
+        })
       }
     }
   }
