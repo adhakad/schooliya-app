@@ -42,7 +42,7 @@ let GetSingleClassExamResultStructureByStream = async (req, res, next) => {
 let CreateExamResultStructure = async (req, res, next) => {
     let className = req.body.class;
     let { adminId, examType, stream } = req.body;
-    let { theoryMaxMarks, theoryPassMarks, practicalMaxMarks, practicalPassMarks, gradeMinMarks, gradeMaxMarks } = req.body.type;
+    let { theoryMaxMarks, theoryPassMarks, practicalMaxMarks, practicalPassMarks, gradeMinMarks, gradeMaxMarks,periodicTestMaxMarks,noteBookMaxMarks,subjectEnrichmentMaxMarks } = req.body.type;
     if (stream === "stream") {
         stream = "N/A";
     }
@@ -66,6 +66,15 @@ let CreateExamResultStructure = async (req, res, next) => {
         if (gradeMaxMarks) {
             examResultStructureData.gradeMinMarks = gradeMinMarks;
             examResultStructureData.gradeMaxMarks = gradeMaxMarks;
+        }
+        if(periodicTestMaxMarks){
+            examResultStructureData.periodicTestMaxMarks = periodicTestMaxMarks;
+        }
+        if(noteBookMaxMarks){
+            examResultStructureData.noteBookMaxMarks = noteBookMaxMarks;
+        }
+        if(subjectEnrichmentMaxMarks){
+            examResultStructureData.subjectEnrichmentMaxMarks = subjectEnrichmentMaxMarks;
         }
 
         let examResultStructure = await ExamResultStructureModel.create(examResultStructureData);

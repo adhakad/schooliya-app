@@ -59,7 +59,7 @@ let CreateFeesCollection = async (req, res, next) => {
         const paidFees = checkFeesCollection.paidFees + feesAmount
         const dueFees = totalFees - paidFees;
         if (totalFees == checkFeesCollection.paidFees) {
-            return res.status(400).json(`All fees installment already paid !`);
+            return res.status(400).json(`All fees amount already paid !`);
         }
         if (feesAmount > checkFeesCollection.dueFees) {
             return res.status(400).json(`Paying fees amount is greater then due fees amount !`);

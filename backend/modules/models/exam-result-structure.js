@@ -25,6 +25,11 @@ const ExamResultStructureModel = mongoose.model('exam-result-structure', {
   theoryPassMarks: {},
   practicalMaxMarks: {},
   practicalPassMarks: {},
+
+  periodicTestMaxMarks:{},
+  noteBookMaxMarks:{},
+  subjectEnrichmentMaxMarks:{},
+
   gradeMinMarks: {},
   gradeMaxMarks: {},
   resultPublishStatus: {

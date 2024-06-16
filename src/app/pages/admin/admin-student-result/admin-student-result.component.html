@@ -21,9 +21,6 @@
               </div>
               <div class="row mb-2">
                 <div class="col-8 col-lg-6">
-                  <!-- <mat-radio-group (change)="onChange($event)">
-                    <mat-radio-button [value]="0" [checked]="selectedValue==0">Single Result</mat-radio-button>
-                  </mat-radio-group> print-pdf -->
                   <button class="submit-button " mat-raised-button (click)="bulkPrint()"><mat-icon
                       style="font-size: 20px;">print</mat-icon> Bulk Print</button>
                 </div>
@@ -172,6 +169,50 @@
                                     </ng-container>
                                   </ng-container>
                                 </ng-container>
+
+                                <ng-container *ngIf="periodicTestSubjects.length>0">
+                                  <h3>Perodic Test marks</h3>
+                                  <ng-container formGroupName="type">
+                                    <ng-container formArrayName="periodicTestMarks">
+                                      <div class="col-6" *ngFor="let subjects of periodicTestSubjects; let i = index">
+                                        <div [formGroupName]="i">
+                                          <mat-form-field appearance="outline">
+                                            <mat-label>{{subjects | titlecase}} Per. Test Marks</mat-label>
+                                            <input matInput type="text" [formControlName]="subjects">
+                                          </mat-form-field>
+                                        </div>
+                                      </div>
+                                    </ng-container>
+                                  </ng-container>
+                                </ng-container><ng-container *ngIf="noteBookSubjects.length>0">
+                                  <h3>Note Book marks</h3>
+                                  <ng-container formGroupName="type">
+                                    <ng-container formArrayName="noteBookMarks">
+                                      <div class="col-6" *ngFor="let subjects of noteBookSubjects; let i = index">
+                                        <div [formGroupName]="i">
+                                          <mat-form-field appearance="outline">
+                                            <mat-label>{{subjects | titlecase}} Note Book Marks</mat-label>
+                                            <input matInput type="text" [formControlName]="subjects">
+                                          </mat-form-field>
+                                        </div>
+                                      </div>
+                                    </ng-container>
+                                  </ng-container>
+                                </ng-container><ng-container *ngIf="subjectEnrichmentSubjects.length>0">
+                                  <h3>Subject Enrichment marks</h3>
+                                  <ng-container formGroupName="type">
+                                    <ng-container formArrayName="subjectEnrichmentMarks">
+                                      <div class="col-6" *ngFor="let subjects of subjectEnrichmentSubjects; let i = index">
+                                        <div [formGroupName]="i">
+                                          <mat-form-field appearance="outline">
+                                            <mat-label>{{subjects | titlecase}} SEA Marks</mat-label>
+                                            <input matInput type="text" [formControlName]="subjects">
+                                          </mat-form-field>
+                                        </div>
+                                      </div>
+                                    </ng-container>
+                                  </ng-container>
+                                </ng-container>
                               </div>
                             </div>
                           </div>
@@ -282,7 +323,7 @@
                                   <tr>
                                     <td><span class="text-bold">Result Status</span> :
                                       {{result.resultDetail.resultStatus}}</td>
-                                    <td><span class="text-bold">Grand Total (Theory + Practical/Internal Marks)</span> :
+                                    <td><span class="text-bold">Grand Total</span> :
                                       {{result.resultDetail.grandTotalMarks}}/{{result.resultDetail.totalMaxMarks}}</td>
                                     <td><span class="text-bold">Percentage</span> : {{result.resultDetail.percentile}}%
                                     </td>
