@@ -1,6 +1,6 @@
 @import'../../../../styles.css';
-@import'../admin-student-fees/admin-student-fees.component.css';
-.file-input {
+@import'../admin-student-fees/admin-student-fees.component.css'; 
+ .file-input {
     height: 50px;
     color: #4e4caacd;
     border: 1px solid #4e4caacd;
@@ -61,3 +61,6 @@
  .custom-container{
     font-size: 12px;
  }
+
+
+ 

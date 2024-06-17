@@ -89,7 +89,12 @@ let GetAllStudentExamResultByClass = async (req, res, next) => {
         if (!examResult) {
             return res.status(404).json({ errorMsg: 'This class exam result not found !' });
         }
-        return res.status(200).json({ examResultInfo: examResult, studentInfo: student });
+        let examType = examResult[0].examType;
+        let examResultStructure = await ExamResultStructureModel.findOne({ adminId: adminId, class: className, examType: examType });
+        if (!examResultStructure) {
+            return res.status(404).json({ errorMsg: 'This class any exam not found !' });
+        }
+        return res.status(200).json({ examResultInfo: examResult, studentInfo: student,examResultStructure:examResultStructure });
     } catch (error) {
         return res.status(500).json({ errorMsg: 'Internal Server Error !' });
     }

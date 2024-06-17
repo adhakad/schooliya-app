@@ -301,12 +301,15 @@
                                     <td>{{result?.motherName | titlecase}}</td>
                                   </tr>
                                 </table>
-                                <table class="custom-table">
-                                  <tr>
+                                <table class="custom-table custom-tr">
+                                  <tr style="background-color: aqua;">
                                     <th>S.No.</th>
                                     <th>Subject</th>
                                     <th>Theory Marks</th>
                                     <th>Practical Marks</th>
+                                    <th>Per. Test</th>
+                                    <th>Note Book</th>
+                                    <TH>SEA</TH>
                                     <th>Total Marks</th>
                                     <th>Grade</th>
                                   </tr>
@@ -315,6 +318,9 @@
                                     <td>{{ exam.subject | titlecase }}</td>
                                     <td>{{ exam.theoryMarks }}</td>
                                     <td>{{ exam.practicalMarks > 0 ? exam.practicalMarks : '' }}</td>
+                                    <td>{{ exam.periodicTestMarks > 0 ? exam.periodicTestMarks : '' }}</td>
+                                    <td>{{ exam.noteBookMarks > 0 ? exam.noteBookMarks : '' }}</td>
+                                    <td>{{ exam.subjectEnrichmentMarks > 0 ? exam.subjectEnrichmentMarks : '' }}</td>
                                     <td>{{ exam.totalMarks }}</td>
                                     <td>{{ exam.grade }}</td>
                                   </tr>

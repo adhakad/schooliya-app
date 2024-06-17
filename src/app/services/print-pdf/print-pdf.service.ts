@@ -74,19 +74,51 @@ export class PrintPdfService {
   //     });
   //   });
   // }
-  printContent(content: string): void {
-    const doc = new jsPDF("p", "mm", "a4");
-    const printWindow = window.open(doc.output('bloburl'), '_blank');
-    if (printWindow) {
-      printWindow.document.write(content);
-      printWindow.document.close();
+  // printContent(content: string): void {
+  //   const doc = new jsPDF("p", "mm", "a4");
+  //   const printWindow = window.open(doc.output('bloburl'), '_blank');
+  //   if (printWindow) {
+  //     printWindow.document.write(content);
+  //     printWindow.document.close();
 
-      // Wait for the content to load before triggering the print operation
-      printWindow.onload = () => {
-        printWindow.print();
-      };
+  //     // Wait for the content to load before triggering the print operation
+  //     printWindow.onload = () => {
+  //       printWindow.print();
+  //     };
+  //   }
+  // }
+  printContent(content: string): void {
+    // Create a new window
+    const printWindow = window.open('', '_blank');
+    
+    if (printWindow) {
+        // Write the content to the new window
+        printWindow.document.write(content);
+        printWindow.document.close();
+        
+        // Wait for the content to load before triggering the print operation
+        printWindow.onload = () => {
+            // Ensure background colors and images are printed
+            const style = printWindow.document.createElement('style');
+            style.innerHTML = `
+                @media print {
+                    * {
+                        -webkit-print-color-adjust: exact !important; /* Chrome, Safari, Edge */
+                        color-adjust: exact !important; /* Firefox */
+                    }
+                }
+            `;
+            printWindow.document.head.appendChild(style);
+
+            printWindow.print();
+            printWindow.close(); // Close the print window after printing
+        };
     }
-  }
+}
+
+
+
+
   generatePDF(element: HTMLElement,params:string): void {
     html2canvas(element).then(canvas => {
       var imgWidth = 208;
