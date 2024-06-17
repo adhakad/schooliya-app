@@ -22,83 +22,16 @@ export class PrintPdfService {
     });
   }
 
-  // printStudents(elements: HTMLElement[]): void {
-  //   const doc = new jsPDF("p", "mm", "a4");
-    
-  //   elements.forEach((element, index) => {
-  //     let position = 0; // Reset position for each student
-      
-  //     html2canvas(element).then(canvas => {
-  //       const imgWidth = 208;
-  //       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  //       const imgData = canvas.toDataURL('image/png');
-
-  //       if (index > 0) {
-  //         doc.addPage(); // Add a new page for each student after the first one
-  //       }
-
-  //       doc.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-  //       position += imgHeight;
-
-  //       if (index === elements.length - 1) {
-  //         // Only auto print and open the window for the last student
-  //         doc.autoPrint();
-  //         window.open(doc.output('bloburl'), '_blank');
-  //       }
-  //     });
-  //   });
-  // }
-  // printStudents(elements: HTMLElement[]): void {
-  //   const doc = new jsPDF("p", "mm", "a4");
-
-  //   elements.forEach((element, index) => {
-  //     let position = 0; // Reset position for each student
-
-  //     html2canvas(element).then(canvas => {
-  //       const imgWidth = doc.internal.pageSize.getWidth(); // Set image width to page width
-  //       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  //       const imgData = canvas.toDataURL('image/png');
-
-  //       if (index > 0) {
-  //         doc.addPage(); // Add a new page for each student after the first one
-  //       }
-
-  //       doc.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-  //       position += imgHeight;
-
-  //       if (index === elements.length - 1) {
-  //         // Only auto print and open the window for the last student
-  //         doc.autoPrint();
-  //         window.open(doc.output('bloburl'), '_blank');
-  //       }
-  //     });
-  //   });
-  // }
-  // printContent(content: string): void {
-  //   const doc = new jsPDF("p", "mm", "a4");
-  //   const printWindow = window.open(doc.output('bloburl'), '_blank');
-  //   if (printWindow) {
-  //     printWindow.document.write(content);
-  //     printWindow.document.close();
-
-  //     // Wait for the content to load before triggering the print operation
-  //     printWindow.onload = () => {
-  //       printWindow.print();
-  //     };
-  //   }
-  // }
+  
   printContent(content: string): void {
-    // Create a new window
-    const printWindow = window.open('', '_blank');
+    const doc = new jsPDF("p", "mm", "a4");
+    const printWindow = window.open(doc.output('bloburl'), '_blank');
     
     if (printWindow) {
-        // Write the content to the new window
         printWindow.document.write(content);
         printWindow.document.close();
         
-        // Wait for the content to load before triggering the print operation
         printWindow.onload = () => {
-            // Ensure background colors and images are printed
             const style = printWindow.document.createElement('style');
             style.innerHTML = `
                 @media print {
@@ -111,13 +44,10 @@ export class PrintPdfService {
             printWindow.document.head.appendChild(style);
 
             printWindow.print();
-            printWindow.close(); // Close the print window after printing
+            printWindow.close();
         };
     }
 }
-
-
-
 
   generatePDF(element: HTMLElement,params:string): void {
     html2canvas(element).then(canvas => {
