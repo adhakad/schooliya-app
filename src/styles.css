@@ -552,15 +552,16 @@ Side navigation section
   }
 
   .side-navbar li button {
-    color: #8C52FF;
+    color: #4a2b89c4;
     width: 100%;
     padding: 5px;
     display: block;
     flex-direction: column;
+    text-align: left;
   }
 
   .side-navbar li button .mat-icon {
-    font-size:medium;
+    font-size:large;
     display: inline-block;
     margin-left: 5px;
     margin-top: 5px;
@@ -573,11 +574,17 @@ Side navigation section
     text-align: center;
     /* margin-top: 2px; */
     margin-left: 15px;
+    letter-spacing: .20px;
   }
 
+  /* .side-navbar li button .mat-icon.active-link {
+    background: #fff;
+    color: #8C52FF;
+    font-size:larger !important;
+  } */
   .side-navbar li button.active-link {
-    background: #8C52FF;
-    color: #fff;
+    background: #fff;
+    color: #8C52FF;
   }
 
   /* 

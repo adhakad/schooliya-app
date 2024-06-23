@@ -11,16 +11,17 @@ const ExamResultStructureModel = mongoose.model('exam-result-structure', {
     required: true,
     trim: true,
   },
-  examType: {
-    type: String,
-    required: true,
-    trim: true,
-  },
   stream: {
     type: String,
     required: true,
     trim: true,
   },
+  examType: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  
   theoryMaxMarks: {},
   theoryPassMarks: {},
   practicalMaxMarks: {},

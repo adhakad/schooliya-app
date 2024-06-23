@@ -79,14 +79,15 @@ let GetSingleStudentExamResultById = async (req, res, next) => {
 }
 let GetAllStudentExamResultByClass = async (req, res, next) => {
     let adminId = req.params.id;
+    
     let className = req.params.class;
     try {
         const student = await StudentModel.find({ adminId: adminId, class: className }, 'adminId session admissionNo name rollNumber class fatherName motherName stream');
-        if (!student) {
+        if (student.length<=0) {
             return res.status(404).json({ errorMsg: 'This class any student not found !' });
         }
         const examResult = await ExamResultModel.find({ adminId: adminId, class: className });
-        if (!examResult) {
+        if (examResult.length<=0) {
             return res.status(404).json({ errorMsg: 'This class exam result not found !' });
         }
         let examType = examResult[0].examType;

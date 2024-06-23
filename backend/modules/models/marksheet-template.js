@@ -1,11 +1,6 @@
 'use strict';
 const mongoose = require('mongoose');
-const MarksheetStructureModel = mongoose.model('marksheet-structure', {
-    session: {
-        type: String,
-        required: true,
-        trim: true,
-    },
+const MarksheetTemplateModel = mongoose.model('marksheet-template', {
     adminId: {
         type: String,
         required: true,
@@ -21,22 +16,11 @@ const MarksheetStructureModel = mongoose.model('marksheet-structure', {
         required: true,
         trim: true,
     },
-
-    // selectedExamType:{0:["halfYearly","final"]},
-
-
-
-
-
-
-
-    resultPublishStatus: {
-        type: Boolean,
+    templateName: {
+        type: String,
         required: true,
         trim: true,
-        enum: [true, false],
-        default: false,
     }
 });
 
-module.exports = MarksheetStructureModel;
+module.exports = MarksheetTemplateModel;

@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AdminStudentMarksheetStructureModule } from './admin-student-marksheet-structure.module';
+import { AdminStudentMarksheetStructureComponent } from './admin-student-marksheet-structure.component';
 
 const routes: Routes = [
-  { path: '', component: AdminStudentMarksheetStructureModule }
+  { path: '', component: AdminStudentMarksheetStructureComponent }
 ];
 
 @NgModule({
